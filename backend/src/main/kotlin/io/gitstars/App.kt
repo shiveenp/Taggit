@@ -1,5 +1,6 @@
 package io.gitstars
 
+import main.kotlin.io.gitstars.getUserStargazingData
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
 import org.http4k.core.Method.*
@@ -12,6 +13,8 @@ import org.http4k.security.OAuthProvider
 import org.http4k.security.gitHub
 import org.http4k.server.Netty
 import org.http4k.server.asServer
+import org.http4k.format.Jackson.asJsonObject
+import org.http4k.format.Jackson.asPrettyJsonString
 
 fun main() {
 
@@ -22,7 +25,6 @@ fun main() {
     val callbackUri = Uri.of("http://localhost:$port/callback")
 
     val oauthPersistence = InsecureCookieBasedOAuthPersistence("gitstars")
-
 
     val oauthProvider = OAuthProvider.gitHub(
         ApacheClient(),
@@ -35,9 +37,8 @@ fun main() {
         routes(
             callbackUri.path bind GET to oauthProvider.callback,
             "/" bind GET to oauthProvider.authFilter.then {
-                println(oauthPersistence.retrieveToken(it)?.value)
-
-                Response(OK).body("hello!")
+                val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
+                Response(OK).body(getUserStargazingData(token!!).asJsonObject().asPrettyJsonString())
             }
         )
 
