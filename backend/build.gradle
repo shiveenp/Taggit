@@ -43,6 +43,7 @@ dependencies {
     implementation("org.http4k:http4k-format-jackson:$http4k_version")
     implementation("org.http4k:http4k-client-apache:$http4k_version")
     implementation("org.http4k:http4k-security-oauth:$http4k_version")
+    compile group: 'me.liuwj.ktorm', name: 'ktorm-core', version: '2.6'
     compile 'org.postgresql:postgresql:42.2.0'
 }
 
