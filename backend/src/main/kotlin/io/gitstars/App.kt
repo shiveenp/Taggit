@@ -1,11 +1,15 @@
 package io.gitstars
 
 import main.kotlin.io.gitstars.getUserStargazingData
+import main.kotlin.io.gitstars.loginOrRegister
+import main.kotlin.io.gitstars.updateUserRepos
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.ServerFilters
+import org.http4k.format.Jackson.asJsonObject
+import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
@@ -13,8 +17,6 @@ import org.http4k.security.OAuthProvider
 import org.http4k.security.gitHub
 import org.http4k.server.Netty
 import org.http4k.server.asServer
-import org.http4k.format.Jackson.asJsonObject
-import org.http4k.format.Jackson.asPrettyJsonString
 
 fun main() {
 
@@ -38,7 +40,9 @@ fun main() {
             callbackUri.path bind GET to oauthProvider.callback,
             "/" bind GET to oauthProvider.authFilter.then {
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
-                Response(OK).body(getUserStargazingData(token!!).asJsonObject().asPrettyJsonString())
+                val savedUserId = loginOrRegister(token!!)
+                updateUserRepos(savedUserId, token)
+                Response(OK).body(getUserStargazingData(token).asJsonObject().asPrettyJsonString())
             }
         )
 
