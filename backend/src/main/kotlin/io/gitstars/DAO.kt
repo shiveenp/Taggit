@@ -5,6 +5,7 @@ import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.schema.*
 import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import java.time.LocalDateTime
+import java.util.*
 
 val db = Database.connect(
     url = "jdbc:postgresql://localhost:5432/gitstars",
@@ -15,7 +16,7 @@ val db = Database.connect(
 )
 
 object Users : Table<Nothing>("users") {
-    val id by int("id").primaryKey()
+    val id by uuid("id").primaryKey()
     val userName by text("user_name")
     val email by text("email")
     val password by text("password")
@@ -29,20 +30,21 @@ object Users : Table<Nothing>("users") {
 }
 
 object Repo : Table<Nothing>("repo") {
-    val id by int("id").primaryKey()
-    val userId by int("user_id")
+    val id by uuid("id").primaryKey()
+    val userId by uuid("user_id")
     val repoId by long("repo_id")
     val repoName by text("repo_name")
     val githubLink by text("github_link")
     val githubDescription by text("github_description")
     val starCount by int("star_count")
     val ownerAvatarUrl by text("owner_avatar_url")
-    val tags by bytes("tags")
+    val metadata by jsonb("metadata", typeRef<Metadata>())
 }
 
 
 fun insertGitstarsUser(githubUser: GithubUser, token: String): Int {
     return Users.insert {
+        it.id to UUID.randomUUID()
         it.userName to githubUser.name
         it.email to githubUser.email
         it.password to "hello_it_me"
@@ -94,8 +96,9 @@ fun getCurrentUserByGithubUserId(userId: Long): List<GitstarUser> {
         }
 }
 
-fun insertRepo(stargazingResponse: StargazingResponse, userId: Int) {
+fun insertRepo(stargazingResponse: StargazingResponse, userId: UUID) {
     Repo.insert {
+        it.id to UUID.randomUUID()
         it.userId to userId
         it.repoId to stargazingResponse.id
         it.repoName to stargazingResponse.name
@@ -104,4 +107,31 @@ fun insertRepo(stargazingResponse: StargazingResponse, userId: Int) {
         it.starCount to stargazingResponse.stargazersCount
         it.ownerAvatarUrl to stargazingResponse.owner.avatarUrl
     }
+}
+
+fun getUserRepos(userId: UUID): List<Long> {
+    return Repo.select(Repo.repoId)
+        .where { Repo.userId eq userId }
+        .map { row -> row[Repo.repoId]!! }
+}
+
+
+fun insertTagsInRepo(repoId: UUID, metadata: Metadata): GitStarsRepo {
+    Repo.update {
+        it.metadata to metadata
+        where { it.id eq repoId }
+    }
+    return Repo.select()
+        .where { Repo.id eq repoId }
+        .map { row ->
+            GitStarsRepo(
+                id = row[Repo.id]!!,
+                userId = row[Repo.userId]!!,
+                repoName = row[Repo.repoName]!!,
+                githubLink = row[Repo.githubLink]!!,
+                githubDescription = row[Repo.githubDescription]!!,
+                ownerAvatarUrl = row[Repo.ownerAvatarUrl]!!,
+                metadata = row[Repo.metadata]!!
+            )
+        }[0]
 }

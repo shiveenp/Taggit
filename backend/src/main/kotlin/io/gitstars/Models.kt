@@ -2,6 +2,7 @@ package main.kotlin.io.gitstars
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
+import java.util.*
 
 data class StargazingResponse(
     val id: Long,
@@ -27,7 +28,7 @@ data class GithubUser(
 )
 
 data class GitstarUser(
-    val id: Int,
+    val id: UUID,
     val userName: String,
     val email: String,
     val githubUserName: String,
@@ -37,12 +38,17 @@ data class GitstarUser(
     val updatedAt: LocalDateTime
 )
 
+data class Metadata(
+    val tags: List<String>
+)
+
 data class GitStarsRepo(
-    val id: Int,
-    val userId: Int,
+    val id: UUID,
+    val userId: UUID,
     val repoName: String,
     val githubLink: String,
     val githubDescription: String,
     val ownerAvatarUrl: String,
-    val tags: List<String>
+    val metadata: Metadata
 )
+

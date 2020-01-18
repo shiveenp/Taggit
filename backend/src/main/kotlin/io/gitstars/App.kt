@@ -1,16 +1,17 @@
 package io.gitstars
 
-import main.kotlin.io.gitstars.getUserStargazingData
-import main.kotlin.io.gitstars.loginOrRegister
-import main.kotlin.io.gitstars.updateUserRepos
+import main.kotlin.io.gitstars.*
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.asPrettyJsonString
+import org.http4k.format.Jackson.auto
 import org.http4k.routing.bind
+import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
@@ -28,6 +29,8 @@ fun main() {
 
     val oauthPersistence = InsecureCookieBasedOAuthPersistence("gitstars")
 
+    val metadataArrayLens = Body.auto<Metadata>().toLens()
+
     val oauthProvider = OAuthProvider.gitHub(
         ApacheClient(),
         Credentials(githubClientId, githubClientSecret),
@@ -41,9 +44,14 @@ fun main() {
             "/" bind GET to oauthProvider.authFilter.then {
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                updateUserRepos(savedUserId, token)
                 Response(OK).body(getUserStargazingData(token).asJsonObject().asPrettyJsonString())
-            }
+            },
+            "repo" bind routes(
+                "{repoId}/tags" bind POST to { request ->
+                    Response(OK).body(addTags(request.path("repoId")?.toUUID()
+                        ?: throw IllegalArgumentException("repoId param cannot be left null"), metadataArrayLens(request)).asJsonObject().asPrettyJsonString())
+                }
+            )
         )
 
     ServerFilters.CatchAll()
