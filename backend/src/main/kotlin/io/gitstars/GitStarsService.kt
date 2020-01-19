@@ -1,5 +1,7 @@
 package main.kotlin.io.gitstars
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.dsl.select
 import me.liuwj.ktorm.dsl.where
@@ -14,10 +16,25 @@ fun loginOrRegister(token: String): UUID {
     } else {
         insertGitstarsUser(githubUser, token)
     }
-    return Users.select(Users.id).where {
-        Users.githubUserId eq githubUser.id
+    return UsersTable.select(UsersTable.id).where {
+        UsersTable.githubUserId eq githubUser.id
     }
-        .map { queryRowSet -> queryRowSet[Users.id] }[0]!!
+        .map { queryRowSet -> queryRowSet[UsersTable.id] }[0]!!
+}
+
+fun syncUserRepos(userId: UUID): UUID {
+    createNewRepoSyncJob(userId)
+    val syncJob = getMostRecentUnfinishedRepoSyncJob(userId)
+    GlobalScope.launch {
+        val token = getUserToken(userId)
+        updateUserRepos(userId, token)
+        completeRepoSyncJob(syncJob.id)
+    }
+    return syncJob.id
+}
+
+fun getsyncJob(jobId: UUID): RepoSyncJob {
+    return getRepoSyncJobUsingId(jobId)
 }
 
 fun updateUserRepos(userId: UUID, token: String) {

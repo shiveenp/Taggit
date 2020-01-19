@@ -39,6 +39,8 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.3'
+
     implementation("org.http4k:http4k-core:$http4k_version")
     implementation("org.http4k:http4k-server-netty:$http4k_version")
     implementation("org.http4k:http4k-format-jackson:$http4k_version")
@@ -49,6 +51,8 @@ dependencies {
     compile("me.liuwj.ktorm:ktorm-support-postgresql:${ktorm_version}")
     compile("me.liuwj.ktorm:ktorm-jackson:${ktorm_version}")
     compile 'org.postgresql:postgresql:42.2.0'
+    compile 'io.github.microutils:kotlin-logging:1.7.7'
+    compile 'org.slf4j:slf4j-simple:1.7.26'
 }
 
 flyway {

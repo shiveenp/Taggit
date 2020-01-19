@@ -11,7 +11,7 @@ data class StargazingResponse(
     val stargazersCount: Int,
     @JsonProperty("html_url")
     val url: String,
-    val description: String,
+    val description: String?,
     val owner: StarredRepoOwner
 )
 
@@ -50,5 +50,12 @@ data class GitStarsRepo(
     val githubDescription: String,
     val ownerAvatarUrl: String,
     val metadata: Metadata
+)
+
+data class RepoSyncJob(
+    val id: UUID,
+    val userId: UUID,
+    val completed: Boolean,
+    val createdAt: LocalDateTime
 )
 

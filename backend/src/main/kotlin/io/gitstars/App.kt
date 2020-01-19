@@ -5,6 +5,7 @@ import org.http4k.client.ApacheClient
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson.asJsonObject
@@ -44,7 +45,16 @@ fun main() {
             "/" bind GET to oauthProvider.authFilter.then {
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                Response(OK).body(getUserStargazingData(token).asJsonObject().asPrettyJsonString())
+                Response(OK).body(savedUserId.toString())
+            },
+            "/user/{userId}/sync" bind POST to { request ->
+                val syncJobId = syncUserRepos(request.path("userId")?.toUUID()
+                    ?: throw IllegalArgumentException("userId param cannot be left null"))
+                Response(ACCEPTED).headers((listOf(Pair("Location", "/sync/$syncJobId"))))
+            },
+            "/sync/{jobId}" bind GET to { request ->
+                Response(OK).body(getRepoSyncJobUsingId(request.path("jobId")?.toUUID()
+                    ?: throw IllegalArgumentException("jobId param cannot be left null")).asJsonObject().asPrettyJsonString())
             },
             "repo" bind routes(
                 "{repoId}/tags" bind POST to { request ->

@@ -15,7 +15,7 @@ val db = Database.connect(
     dialect = PostgreSqlDialect()
 )
 
-object Users : Table<Nothing>("users") {
+object UsersTable : Table<Nothing>("users") {
     val id by uuid("id").primaryKey()
     val userName by text("user_name")
     val email by text("email")
@@ -29,7 +29,7 @@ object Users : Table<Nothing>("users") {
     val updatedAt by datetime("updated_at")
 }
 
-object Repo : Table<Nothing>("repo") {
+object RepoTable : Table<Nothing>("repo") {
     val id by uuid("id").primaryKey()
     val userId by uuid("user_id")
     val repoId by long("repo_id")
@@ -41,9 +41,22 @@ object Repo : Table<Nothing>("repo") {
     val metadata by jsonb("metadata", typeRef<Metadata>())
 }
 
+object RepoSyncJobsTable : Table<Nothing>("repo_sync_jobs") {
+    val id by uuid("id").primaryKey()
+    val userId by uuid("user_id")
+    val completed by boolean("completed")
+    val createdAt by datetime("created_at")
+}
+
+
+fun getUserToken(userId: UUID): String {
+    return UsersTable.select(UsersTable.accessToken)
+        .where { UsersTable.id eq userId }
+        .map { row -> row[UsersTable.accessToken]!! }[0]
+}
 
 fun insertGitstarsUser(githubUser: GithubUser, token: String): Int {
-    return Users.insert {
+    return UsersTable.insert {
         it.id to UUID.randomUUID()
         it.userName to githubUser.name
         it.email to githubUser.email
@@ -60,7 +73,7 @@ fun insertGitstarsUser(githubUser: GithubUser, token: String): Int {
 
 fun updateGitstarsUser(githubUser: GithubUser, oldAccessToken: String, newAccessToken: String): Int {
     return if (oldAccessToken != newAccessToken) {
-        Users.update {
+        UsersTable.update {
             it.userName to githubUser.name
             it.githubUserName to githubUser.login
             it.githubUserId to githubUser.id
@@ -70,7 +83,7 @@ fun updateGitstarsUser(githubUser: GithubUser, oldAccessToken: String, newAccess
             it.updatedAt to LocalDateTime.now()
         }
     } else {
-        Users.update {
+        UsersTable.update {
             it.userName to githubUser.name
             it.githubUserName to githubUser.login
             it.githubUserId to githubUser.id
@@ -80,24 +93,24 @@ fun updateGitstarsUser(githubUser: GithubUser, oldAccessToken: String, newAccess
 }
 
 fun getCurrentUserByGithubUserId(userId: Long): List<GitstarUser> {
-    return Users.select()
-        .where { Users.githubUserId eq userId }
+    return UsersTable.select()
+        .where { UsersTable.githubUserId eq userId }
         .map { row ->
             GitstarUser(
-                id = row[Users.id]!!,
-                userName = row[Users.userName]!!,
-                email = row[Users.email]!!,
-                githubUserName = row[Users.githubUserName]!!,
-                githubUserId = row[Users.githubUserId]!!,
-                accessToken = row[Users.accessToken]!!,
-                createdAt = row[Users.createdAt]!!,
-                updatedAt = row[Users.updatedAt]!!
+                id = row[UsersTable.id]!!,
+                userName = row[UsersTable.userName]!!,
+                email = row[UsersTable.email]!!,
+                githubUserName = row[UsersTable.githubUserName]!!,
+                githubUserId = row[UsersTable.githubUserId]!!,
+                accessToken = row[UsersTable.accessToken]!!,
+                createdAt = row[UsersTable.createdAt]!!,
+                updatedAt = row[UsersTable.updatedAt]!!
             )
         }
 }
 
 fun insertRepo(stargazingResponse: StargazingResponse, userId: UUID) {
-    Repo.insert {
+    RepoTable.insert {
         it.id to UUID.randomUUID()
         it.userId to userId
         it.repoId to stargazingResponse.id
@@ -110,28 +123,72 @@ fun insertRepo(stargazingResponse: StargazingResponse, userId: UUID) {
 }
 
 fun getUserRepos(userId: UUID): List<Long> {
-    return Repo.select(Repo.repoId)
-        .where { Repo.userId eq userId }
-        .map { row -> row[Repo.repoId]!! }
+    return RepoTable.select(RepoTable.repoId)
+        .where { RepoTable.userId eq userId }
+        .map { row -> row[RepoTable.repoId]!! }
 }
 
 
 fun insertTagsInRepo(repoId: UUID, metadata: Metadata): GitStarsRepo {
-    Repo.update {
+    RepoTable.update {
         it.metadata to metadata
         where { it.id eq repoId }
     }
-    return Repo.select()
-        .where { Repo.id eq repoId }
+    return RepoTable.select()
+        .where { RepoTable.id eq repoId }
         .map { row ->
             GitStarsRepo(
-                id = row[Repo.id]!!,
-                userId = row[Repo.userId]!!,
-                repoName = row[Repo.repoName]!!,
-                githubLink = row[Repo.githubLink]!!,
-                githubDescription = row[Repo.githubDescription]!!,
-                ownerAvatarUrl = row[Repo.ownerAvatarUrl]!!,
-                metadata = row[Repo.metadata]!!
+                id = row[RepoTable.id]!!,
+                userId = row[RepoTable.userId]!!,
+                repoName = row[RepoTable.repoName]!!,
+                githubLink = row[RepoTable.githubLink]!!,
+                githubDescription = row[RepoTable.githubDescription]!!,
+                ownerAvatarUrl = row[RepoTable.ownerAvatarUrl]!!,
+                metadata = row[RepoTable.metadata]!!
             )
         }[0]
 }
+
+fun getRepoSyncJobUsingId(jobId: UUID): RepoSyncJob {
+    return RepoSyncJobsTable.select()
+        .where { RepoSyncJobsTable.id eq jobId }
+        .map { row ->
+            RepoSyncJob(
+                row[RepoSyncJobsTable.id]!!,
+                row[RepoSyncJobsTable.userId]!!,
+                row[RepoSyncJobsTable.completed]!!,
+                row[RepoSyncJobsTable.createdAt]!!)
+        }[0]
+}
+
+fun getMostRecentUnfinishedRepoSyncJob(userId: UUID): RepoSyncJob {
+    return RepoSyncJobsTable.select()
+        .where {
+            RepoSyncJobsTable.userId eq userId
+            RepoSyncJobsTable.completed eq false
+        }
+        .orderBy(RepoSyncJobsTable.createdAt.desc())
+        .map { row ->
+            RepoSyncJob(
+                row[RepoSyncJobsTable.id]!!,
+                row[RepoSyncJobsTable.userId]!!,
+                row[RepoSyncJobsTable.completed]!!,
+                row[RepoSyncJobsTable.createdAt]!!)
+        }[0]
+}
+
+fun completeRepoSyncJob(jobId: UUID) {
+    RepoSyncJobsTable.update {
+        it.completed to true
+        where { RepoSyncJobsTable.id eq jobId }
+    }
+}
+
+fun createNewRepoSyncJob(userId: UUID) {
+    RepoSyncJobsTable.insert {
+        it.id to UUID.randomUUID()
+        it.userId to userId
+        it.completed to false
+    }
+}
+
