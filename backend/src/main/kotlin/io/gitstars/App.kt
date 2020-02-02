@@ -1,12 +1,16 @@
 package io.gitstars
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import main.kotlin.io.gitstars.*
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
-import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
+import org.http4k.core.Method.*
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.PERMANENT_REDIRECT
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.asPrettyJsonString
@@ -42,10 +46,14 @@ fun main() {
     val app: HttpHandler =
         routes(
             callbackUri.path bind GET to oauthProvider.callback,
-            "/" bind GET to oauthProvider.authFilter.then {
+            "/login2" bind GET to {
+                Response(PERMANENT_REDIRECT).header("location", "https://github.com/login/oauth/authorize?client_id=04a50fefd14124ecfb84&response_type=code&scope=user&redirect_uri=http://localhost:9000/callback").header("Access-Control-Allow-Origin", "*")
+            },
+            "/login" bind GET to oauthProvider.authFilter.then {
+                println(it)
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                Response(OK).body(savedUserId.toString())
+                Response(TEMPORARY_REDIRECT).header("location", "http://localhost:8080/home")
             },
             "/user/{userId}/sync" bind POST to { request ->
                 val syncJobId = syncUserRepos(request.path("userId")?.toUUID()
@@ -64,7 +72,9 @@ fun main() {
             )
         )
 
-    ServerFilters.CatchAll()
+    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive)
         .then(app)
-        .asServer(Netty(port)).start().block()
+        .asServer(Netty(port))
+        .start()
+        .block()
 }
