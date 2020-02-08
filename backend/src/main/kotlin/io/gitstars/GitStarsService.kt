@@ -22,6 +22,10 @@ fun loginOrRegister(token: String): UUID {
         .map { queryRowSet -> queryRowSet[UsersTable.id] }[0]!!
 }
 
+fun getUser(userId: UUID): GitstarUser {
+    return getGitStarUser(userId)[0]
+}
+
 fun syncUserRepos(userId: UUID): UUID {
     createNewRepoSyncJob(userId)
     val syncJob = getMostRecentUnfinishedRepoSyncJob(userId)

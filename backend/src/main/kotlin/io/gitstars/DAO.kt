@@ -92,9 +92,26 @@ fun updateGitstarsUser(githubUser: GithubUser, oldAccessToken: String, newAccess
     }
 }
 
-fun getCurrentUserByGithubUserId(userId: Long): List<GitstarUser> {
+fun getGitStarUser(userId: UUID): List<GitstarUser> {
     return UsersTable.select()
-        .where { UsersTable.githubUserId eq userId }
+        .where { UsersTable.id eq userId }
+        .map { row ->
+            GitstarUser(
+                id = row[UsersTable.id]!!,
+                userName = row[UsersTable.userName]!!,
+                email = row[UsersTable.email]!!,
+                githubUserName = row[UsersTable.githubUserName]!!,
+                githubUserId = row[UsersTable.githubUserId]!!,
+                accessToken = row[UsersTable.accessToken]!!,
+                createdAt = row[UsersTable.createdAt]!!,
+                updatedAt = row[UsersTable.updatedAt]!!
+            )
+        }
+}
+
+fun getCurrentUserByGithubUserId(githubUserId: Long): List<GitstarUser> {
+    return UsersTable.select()
+        .where { UsersTable.githubUserId eq githubUserId }
         .map { row ->
             GitstarUser(
                 id = row[UsersTable.id]!!,

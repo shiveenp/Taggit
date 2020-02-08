@@ -1,14 +1,12 @@
 package io.gitstars
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import main.kotlin.io.gitstars.*
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.PERMANENT_REDIRECT
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ServerFilters
@@ -28,7 +26,7 @@ fun main() {
 
     val githubClientId = System.getenv("GITHUB_CLIENT_ID")
     val githubClientSecret = System.getenv("GITHUB_CLIENT_SECRET")
-    val port = 9000
+    val port = 9001
 
     val callbackUri = Uri.of("http://localhost:$port/callback")
 
@@ -46,14 +44,15 @@ fun main() {
     val app: HttpHandler =
         routes(
             callbackUri.path bind GET to oauthProvider.callback,
-            "/login2" bind GET to {
-                Response(PERMANENT_REDIRECT).header("location", "https://github.com/login/oauth/authorize?client_id=04a50fefd14124ecfb84&response_type=code&scope=user&redirect_uri=http://localhost:9000/callback").header("Access-Control-Allow-Origin", "*")
-            },
             "/login" bind GET to oauthProvider.authFilter.then {
                 println(it)
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                Response(TEMPORARY_REDIRECT).header("location", "http://localhost:8080/home")
+                Response(TEMPORARY_REDIRECT).header("location", "http://localhost:8080/user/$savedUserId")
+            },
+            "/user/{userId}" bind GET to { request ->
+                Response(OK).body(getUser(request.path("userId")?.toUUID()
+                    ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
             },
             "/user/{userId}/sync" bind POST to { request ->
                 val syncJobId = syncUserRepos(request.path("userId")?.toUUID()
