@@ -1,6 +1,12 @@
 package io.gitstars
 
 import main.kotlin.io.gitstars.*
+import main.kotlin.io.gitstars.DAO.getRepoSyncJobUsingId
+import main.kotlin.io.gitstars.GitStarsService.addTags
+import main.kotlin.io.gitstars.GitStarsService.getUser
+import main.kotlin.io.gitstars.GitStarsService.getUserRepos
+import main.kotlin.io.gitstars.GitStarsService.loginOrRegister
+import main.kotlin.io.gitstars.GitStarsService.syncUserRepos
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
 import org.http4k.core.Method.GET
@@ -52,6 +58,10 @@ fun main() {
             },
             "/user/{userId}" bind GET to { request ->
                 Response(OK).body(getUser(request.path("userId")?.toUUID()
+                    ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
+            },
+            "/user/{userId}/repos" bind GET to {request ->
+                Response(OK).body(getUserRepos(request.path("userId")?.toUUID()
                     ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
             },
             "/user/{userId}/sync" bind POST to { request ->

@@ -47,9 +47,9 @@ data class GitStarsRepo(
     val userId: UUID,
     val repoName: String,
     val githubLink: String,
-    val githubDescription: String,
+    val githubDescription: String?,
     val ownerAvatarUrl: String,
-    val metadata: Metadata
+    val metadata: Metadata?
 )
 
 data class RepoSyncJob(
