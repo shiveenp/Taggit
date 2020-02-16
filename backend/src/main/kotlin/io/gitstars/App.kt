@@ -4,6 +4,7 @@ import main.kotlin.io.gitstars.*
 import main.kotlin.io.gitstars.DAO.getRepoSyncJobUsingId
 import main.kotlin.io.gitstars.GitStarsService.addTag
 import main.kotlin.io.gitstars.GitStarsService.deleteTag
+import main.kotlin.io.gitstars.GitStarsService.getAllTags
 import main.kotlin.io.gitstars.GitStarsService.getUser
 import main.kotlin.io.gitstars.GitStarsService.getUserRepos
 import main.kotlin.io.gitstars.GitStarsService.loginOrRegister
@@ -61,7 +62,7 @@ fun main() {
                 Response(OK).body(getUser(request.path("userId")?.toUUID()
                     ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
             },
-            "/user/{userId}/repos" bind GET to {request ->
+            "/user/{userId}/repos" bind GET to { request ->
                 Response(OK).body(getUserRepos(request.path("userId")?.toUUID()
                     ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
             },
@@ -69,6 +70,10 @@ fun main() {
                 val syncJobId = syncUserRepos(request.path("userId")?.toUUID()
                     ?: throw IllegalArgumentException("userId param cannot be left null"))
                 Response(ACCEPTED).headers((listOf(Pair("Location", "/sync/$syncJobId"))))
+            },
+            "/user/{userId}/tags" bind GET to { request ->
+                Response(OK).body(getAllTags(request.path("userId")?.toUUID()
+                    ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
             },
             "/sync/{jobId}" bind GET to { request ->
                 Response(OK).body(getRepoSyncJobUsingId(request.path("jobId")?.toUUID()
@@ -81,7 +86,8 @@ fun main() {
                 },
                 "{repoId}/tag/{tag}" bind Method.DELETE to { request ->
                     Response(OK).body(deleteTag(request.path("repoId")?.toUUID()
-                        ?: throw IllegalArgumentException("repoId param cannot be left null"), request.path("tag") ?: throw IllegalArgumentException("Tag to delete cannot be null")).asJsonObject().asPrettyJsonString())
+                        ?: throw IllegalArgumentException("repoId param cannot be left null"), request.path("tag")
+                        ?: throw IllegalArgumentException("Tag to delete cannot be null")).asJsonObject().asPrettyJsonString())
                 }
             )
         )

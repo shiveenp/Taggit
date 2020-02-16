@@ -13,6 +13,7 @@
     "babel-preset-vue": "^2.0.2",
     "buefy": "^0.8.8",
     "core-js": "^3.4.3",
+    "lodash": "^4.17.15",
     "node-sass": "^4.13.0",
     "sass-loader": "^8.0.0",
     "vue": "^2.6.10",
@@ -39,7 +40,8 @@
       "eslint:recommended"
     ],
     "rules": {
-      "no-console": "off"
+      "no-console": "off",
+      "no-unused-vars": "off"
     },
     "parserOptions": {
       "parser": "babel-eslint"

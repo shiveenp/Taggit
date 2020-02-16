@@ -224,6 +224,16 @@ object DAO {
             }[0]
     }
 
+    fun getAllDistinctTags(userId: UUID): List<String> {
+        return RepoTable.select(RepoTable.metadata)
+            .where { RepoTable.userId eq userId }
+            .map { row -> row[RepoTable.metadata] }
+            .filterNotNull()
+            .flatMap {
+                it.tags
+            }.toSet().toList()
+    }
+
     fun getRepoSyncJobUsingId(jobId: UUID): RepoSyncJob {
         return RepoSyncJobsTable.select()
             .where { RepoSyncJobsTable.id eq jobId }

@@ -38,6 +38,9 @@ const mutations = {
     state.githubUserName = data.githubUserName;
     state.githubUserId = data.githubUserId;
     state.isLoading = false;
+  },
+  fetchFinished(state) {
+    state.isLoading = false
   }
 };
 

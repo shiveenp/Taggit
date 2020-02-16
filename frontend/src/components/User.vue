@@ -13,6 +13,9 @@
             </b-tooltip>
         </div>
         <div class="section">
+            <TagsList></TagsList>
+        </div>
+        <div class="section">
             <Repos></Repos>
         </div>
         <footer class="footer">
@@ -31,10 +34,11 @@
 <script>
   import {mapGetters} from "vuex";
   import Repos from "./Repos";
+  import TagsList from "./TagsList";
 
   export default {
     name: "User",
-    components: {Repos},
+    components: {TagsList, Repos},
     computed: {
       ...mapGetters(["userName", "email", "githubUserName", "githubUserId", "isLoading"])
     },

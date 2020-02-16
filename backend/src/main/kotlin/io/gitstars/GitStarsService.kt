@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import main.kotlin.io.gitstars.DAO.completeRepoSyncJob
 import main.kotlin.io.gitstars.DAO.createNewRepoSyncJob
 import main.kotlin.io.gitstars.DAO.deleteTagFromRepo
+import main.kotlin.io.gitstars.DAO.getAllDistinctTags
 import main.kotlin.io.gitstars.DAO.getCurrentUserByGithubUserId
 import main.kotlin.io.gitstars.DAO.getGitStarUser
 import main.kotlin.io.gitstars.DAO.getMostRecentUnfinishedRepoSyncJob
@@ -39,7 +40,6 @@ object GitStarsService {
     }
 
     fun getUserRepos(userId: UUID): List<GitStarsRepo> {
-        println("user id is $userId")
         return try {
             DAO.getUserRepos(userId)
         } catch (ex: Exception) {
@@ -79,5 +79,9 @@ object GitStarsService {
 
     fun deleteTag(repoId: UUID, tagToDelete: String): GitStarsRepo {
         return deleteTagFromRepo(repoId, tagToDelete)
+    }
+
+    fun getAllTags(userId: UUID): List<String> {
+        return getAllDistinctTags(userId)
     }
 }
