@@ -14,14 +14,64 @@
             <div class="content">
                 <p>{{ githubDescription }}</p>
             </div>
+            <div>
+                <b-field>
+                    <b-taginput
+                            v-model="tags"
+                            ellipsis
+                            icon="label"
+                            placeholder="Add a tag"
+                            size="is-small"
+                            type="is-dark"
+                            v-on:add="saveTag"
+                            v-on:remove="removeTag">
+                    </b-taginput>
+                </b-field>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+  import axios from "axios";
+
   export default {
-    props: ['repoName', 'githubLink', 'githubDescription', 'ownerAvatarUrl'],
-    name: "GithubRepo"
+    data() {
+      return {
+        tags: [],
+        isTagInputVisible: false,
+      }
+    },
+    props: ['id', 'repoName', 'githubLink', 'githubDescription', 'ownerAvatarUrl', 'metadata'],
+    name: "GithubRepo",
+    methods: {
+      saveTag(tag) {
+        axios.post('http://localhost:9001/repo/' + this.id + '/tag',
+            {
+              tag
+            },
+            {
+              'Content-Type': 'application/json'
+            })
+      },
+      removeTag(tag) {
+        axios.delete('http://localhost:9001/repo/' + this.id + '/tag/' + tag,
+            {
+              'Content-Type': 'application/json'
+            })
+      },
+      mountTags() {
+        if (!(this.metadata === undefined) && !(this.metadata === null)) {
+          this.tags = this.metadata.tags;
+        }
+      },
+      makeTagInputVisible() {
+        this.isTagInputVisible = !this.isTagInputVisible
+      }
+    },
+    mounted() {
+      this.mountTags()
+    }
   }
 </script>
 

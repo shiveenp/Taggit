@@ -1,7 +1,7 @@
 <template>
   <div class="flex-container">
     <div class="container">
-      <h1>Welcome To Gitstars</h1>
+      <h1>Welcome To Taggit</h1>
       <form class="form">
         <b-button size="is-medium"
                   icon-left="github-circle" v-on:click="login">

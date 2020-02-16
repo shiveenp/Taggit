@@ -4,13 +4,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import main.kotlin.io.gitstars.DAO.completeRepoSyncJob
 import main.kotlin.io.gitstars.DAO.createNewRepoSyncJob
+import main.kotlin.io.gitstars.DAO.deleteTagFromRepo
 import main.kotlin.io.gitstars.DAO.getCurrentUserByGithubUserId
 import main.kotlin.io.gitstars.DAO.getGitStarUser
 import main.kotlin.io.gitstars.DAO.getMostRecentUnfinishedRepoSyncJob
 import main.kotlin.io.gitstars.DAO.getRepoSyncJobUsingId
 import main.kotlin.io.gitstars.DAO.getUserToken
 import main.kotlin.io.gitstars.DAO.insertGitstarsUser
-import main.kotlin.io.gitstars.DAO.insertTagsInRepo
+import main.kotlin.io.gitstars.DAO.insertTagInRepo
 import main.kotlin.io.gitstars.DAO.updateGitstarsUser
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.dsl.select
@@ -72,7 +73,11 @@ object GitStarsService {
         }
     }
 
-    fun addTags(repoId: UUID, tags: Metadata): GitStarsRepo {
-        return insertTagsInRepo(repoId, tags)
+    fun addTag(repoId: UUID, tagInput: TagInput): GitStarsRepo {
+        return insertTagInRepo(repoId, tagInput.tag)
+    }
+
+    fun deleteTag(repoId: UUID, tagToDelete: String): GitStarsRepo {
+        return deleteTagFromRepo(repoId, tagToDelete)
     }
 }

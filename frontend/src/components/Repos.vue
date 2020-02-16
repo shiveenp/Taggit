@@ -2,10 +2,12 @@
     <div class="container is-fluid">
         <div class="columns is-multiline is-mobile">
             <div class="column" v-for="repo in reposList" v-bind:key="repo">
-                <GithubRepo v-bind:repo-name="repo.repoName"
+                <GithubRepo v-bind:id="repo.id"
+                            v-bind:repo-name="repo.repoName"
                             v-bind:github-link="repo.githubLink"
                             v-bind:github-description="repo.githubDescription"
-                            v-bind:owner-avatar-url="repo.ownerAvatarUrl"></GithubRepo>
+                            v-bind:owner-avatar-url="repo.ownerAvatarUrl"
+                            v-bind:metadata="repo.metadata"></GithubRepo>
             </div>
         </div>
     </div>

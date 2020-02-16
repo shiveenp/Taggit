@@ -5,21 +5,14 @@
             <h1 class="title">Welcome, {{ userName }}! 🤩</h1>
         </div>
         <div class="section">
-            <div class="columns">
-                <div class="column">
-                    <b-icon icon="star" type="is-primary"></b-icon>
-                    <span class="subtitle">Your starred repos</span>
-                    <b-icon icon="star" type="is-primary"></b-icon>
-                </div>
-                <div class="column">
-                    <b-tooltip label="Sync starred repos with github again">
-                        <button class="button is-primary has-tooltip" data-tooltip="Tooltip Text">
-                            <b-icon icon="reload"></b-icon>
-                            <span>Resync</span>
-                        </button>
-                    </b-tooltip>
-                </div>
-            </div>
+            <b-tooltip class="is-pulled-right" label="Sync starred repos with github again">
+                <button class="button is-primary has-tooltip" data-tooltip="Tooltip Text">
+                    <b-icon icon="reload"></b-icon>
+                    <span>Resync</span>
+                </button>
+            </b-tooltip>
+        </div>
+        <div class="section">
             <Repos></Repos>
         </div>
         <footer class="footer">

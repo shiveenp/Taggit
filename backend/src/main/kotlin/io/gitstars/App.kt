@@ -2,7 +2,8 @@ package io.gitstars
 
 import main.kotlin.io.gitstars.*
 import main.kotlin.io.gitstars.DAO.getRepoSyncJobUsingId
-import main.kotlin.io.gitstars.GitStarsService.addTags
+import main.kotlin.io.gitstars.GitStarsService.addTag
+import main.kotlin.io.gitstars.GitStarsService.deleteTag
 import main.kotlin.io.gitstars.GitStarsService.getUser
 import main.kotlin.io.gitstars.GitStarsService.getUserRepos
 import main.kotlin.io.gitstars.GitStarsService.loginOrRegister
@@ -38,7 +39,7 @@ fun main() {
 
     val oauthPersistence = InsecureCookieBasedOAuthPersistence("gitstars")
 
-    val metadataArrayLens = Body.auto<Metadata>().toLens()
+    val tagStringLens = Body.auto<TagInput>().toLens()
 
     val oauthProvider = OAuthProvider.gitHub(
         ApacheClient(),
@@ -74,9 +75,13 @@ fun main() {
                     ?: throw IllegalArgumentException("jobId param cannot be left null")).asJsonObject().asPrettyJsonString())
             },
             "repo" bind routes(
-                "{repoId}/tags" bind POST to { request ->
-                    Response(OK).body(addTags(request.path("repoId")?.toUUID()
-                        ?: throw IllegalArgumentException("repoId param cannot be left null"), metadataArrayLens(request)).asJsonObject().asPrettyJsonString())
+                "{repoId}/tag" bind POST to { request ->
+                    Response(OK).body(addTag(request.path("repoId")?.toUUID()
+                        ?: throw IllegalArgumentException("repoId param cannot be left null"), tagStringLens(request)).asJsonObject().asPrettyJsonString())
+                },
+                "{repoId}/tag/{tag}" bind Method.DELETE to { request ->
+                    Response(OK).body(deleteTag(request.path("repoId")?.toUUID()
+                        ?: throw IllegalArgumentException("repoId param cannot be left null"), request.path("tag") ?: throw IllegalArgumentException("Tag to delete cannot be null")).asJsonObject().asPrettyJsonString())
                 }
             )
         )

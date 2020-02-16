@@ -143,6 +143,7 @@ object DAO {
     fun getUserRepos(userId: UUID): List<GitStarsRepo> {
         return RepoTable.select()
             .where { RepoTable.userId eq userId }
+            .orderBy(RepoTable.repoName.asc())
             .map { row ->
                 GitStarsRepo(
                     id = row[RepoTable.id]!!,
@@ -157,9 +158,55 @@ object DAO {
     }
 
 
-    fun insertTagsInRepo(repoId: UUID, metadata: Metadata): GitStarsRepo {
+    fun insertTagInRepo(repoId: UUID, tag: String): GitStarsRepo {
+        val existingMetadata = RepoTable.select(RepoTable.metadata)
+            .where { RepoTable.id eq repoId }
+            .map { row -> row[RepoTable.metadata] }[0]
+        val metadataToSave = if (existingMetadata != null) {
+            val currentTags = existingMetadata.tags
+            val updatedTags = currentTags.toMutableList()
+            updatedTags.add(tag)
+            // avoid saving same tag twice
+            Metadata(tags = updatedTags.toSet().toList())
+        } else {
+            Metadata(tags = listOf(tag))
+        }
         RepoTable.update {
-            it.metadata to metadata
+            it.metadata to metadataToSave
+            where { it.id eq repoId }
+        }
+        return RepoTable.select()
+            .where { RepoTable.id eq repoId }
+            .map { row ->
+                GitStarsRepo(
+                    id = row[RepoTable.id]!!,
+                    userId = row[RepoTable.userId]!!,
+                    repoName = row[RepoTable.repoName]!!,
+                    githubLink = row[RepoTable.githubLink]!!,
+                    githubDescription = row[RepoTable.githubDescription]!!,
+                    ownerAvatarUrl = row[RepoTable.ownerAvatarUrl]!!,
+                    metadata = row[RepoTable.metadata]!!
+                )
+            }[0]
+    }
+
+    fun deleteTagFromRepo(repoId: UUID, tag: String): GitStarsRepo {
+        val existingMetadata = RepoTable.select(RepoTable.metadata)
+            .where { RepoTable.id eq repoId }
+            .map { row -> row[RepoTable.metadata] }[0]
+
+        val metadataToSave = if (existingMetadata != null) {
+            val currentTags = existingMetadata.tags
+            val updatedTags = currentTags.toMutableList()
+            updatedTags.remove(tag)
+            // avoid saving same tag twice
+            Metadata(tags = updatedTags.toSet().toList())
+        } else {
+            // shouldn't ever come here, but save an empty list any ways coz I hate playing with nulls
+            Metadata(tags = listOf())
+        }
+        RepoTable.update {
+            it.metadata to metadataToSave
             where { it.id eq repoId }
         }
         return RepoTable.select()

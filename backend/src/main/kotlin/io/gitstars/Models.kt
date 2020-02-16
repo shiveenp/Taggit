@@ -38,6 +38,10 @@ data class GitstarUser(
     val updatedAt: LocalDateTime
 )
 
+data class TagInput(
+    val tag: String
+)
+
 data class Metadata(
     val tags: List<String>
 )
