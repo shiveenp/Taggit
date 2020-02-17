@@ -231,7 +231,7 @@ object DAO {
             .filterNotNull()
             .flatMap {
                 it.tags
-            }.toSet().toList()
+            }.toSortedSet().toList()
     }
 
     fun getRepoSyncJobUsingId(jobId: UUID): RepoSyncJob {

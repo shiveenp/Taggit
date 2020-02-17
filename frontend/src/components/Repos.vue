@@ -1,7 +1,7 @@
 <template>
     <div class="container is-fluid">
         <div class="columns is-multiline is-mobile">
-            <div class="column" v-for="repo in reposList" v-bind:key="repo">
+            <div class="column" v-for="repo in repoListToDisplay" v-bind:key="repo">
                 <GithubRepo v-bind:id="repo.id"
                             v-bind:repo-name="repo.repoName"
                             v-bind:github-link="repo.githubLink"
@@ -24,6 +24,7 @@
     components: {GithubRepo},
     data() {
       return {
+        repoListToDisplay: [],
         reposList: [],
       }
     },
@@ -33,12 +34,14 @@
     watch: {
       // eslint-disable-next-line no-unused-vars
       activeTag(newValue, oldValue) {
-        if (newValue !== '') {
-          this.reposList = _.filter(this.reposList, function (repo) {
-            if (!(repo.metadata === null) && (repo.metadata.tags.includes(newValue))){
+        if (newValue !== []) {
+          this.repoListToDisplay = _.filter(this.reposList, function (repo) {
+            if (!(repo.metadata === null) && (repo.metadata.tags.some(r => this.activeTag.includes(r)))) {
               return repo
             }
           })
+        } else {
+          this.repoListToDisplay = this.reposList;
         }
       }
     },
@@ -50,6 +53,7 @@
           }
         }).then(({data}) => {
           this.reposList = data;
+          this.repoListToDisplay = data;
         })
             .catch(error => {
               throw new Error(error);

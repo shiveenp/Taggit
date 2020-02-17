@@ -21,11 +21,12 @@
     methods: {
       buttonClicked() {
          if (this.buttonType === 'is-light') {
-           this.buttonType = 'is-dark'
+           this.buttonType = 'is-dark';
+           this.$store.dispatch('activateTag', [this.tag]);
          } else {
-           this.buttonType = 'is-light'
+           this.buttonType = 'is-light';
+           this.$store.dispatch('deactivateTag', this.tag);
          }
-        this.$store.dispatch('activateTag', this.tag);
       }
     }
   }
