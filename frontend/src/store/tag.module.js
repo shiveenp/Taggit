@@ -5,18 +5,22 @@ const state = {
 };
 
 const getters = {
-  activeTag(state) {
+  activeTags(state) {
     return state.activeTags
   }
 };
 
 const mutations = {
   activateTag(state, data) {
-    state.activeTags.push(data)
+    console.log(state.activeTags);
+    if (!state.activeTags.includes(data)) {
+      console.log(`state does not include ${data}`)
+      state.activeTags.push(data)
+    }
   },
   deactivateTag(state, data) {
-    _.remove(state.activeTags, function (n) {
-      return n === data;
+    state.activeTags = state.activeTags.filter(function (value) {
+      return value !== data
     })
   },
 };

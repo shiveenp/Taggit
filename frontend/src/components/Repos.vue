@@ -14,7 +14,6 @@
 </template>
 
 <script>
-  import _ from "lodash"
   import GithubRepo from "./GitHubRepo";
   import axios from "axios";
   import {mapGetters} from "vuex";
@@ -29,17 +28,15 @@
       }
     },
     computed: {
-      ...mapGetters(["activeTag"])
+      ...mapGetters(["activeTags"])
     },
     watch: {
       // eslint-disable-next-line no-unused-vars
-      activeTag(newValue, oldValue) {
-        if (newValue !== []) {
-          this.repoListToDisplay = _.filter(this.reposList, function (repo) {
-            if (!(repo.metadata === null) && (repo.metadata.tags.some(r => this.activeTag.includes(r)))) {
-              return repo
-            }
-          })
+      activeTags(newValue, oldValue) {
+        if (newValue.length > 0) {
+          this.repoListToDisplay = this.reposList.filter(function (repo) {
+            return (repo.metadata !== null && (repo.metadata.tags.some(r => newValue.includes(r))))
+          });
         } else {
           this.repoListToDisplay = this.reposList;
         }
