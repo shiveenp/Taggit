@@ -4,7 +4,7 @@
             <div class="media">
                 <div class="media-left">
                     <figure class="image is-32x32">
-                        <img class="is-rounded" :src="ownerAvatarUrl">
+                        <img class="is-rounded" v-lazy="ownerAvatarUrl">
                     </figure>
                 </div>
                 <div class="media-content">
