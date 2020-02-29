@@ -8,6 +8,7 @@ import main.kotlin.io.gitstars.GitStarsService.getAllTags
 import main.kotlin.io.gitstars.GitStarsService.getUser
 import main.kotlin.io.gitstars.GitStarsService.getUserRepos
 import main.kotlin.io.gitstars.GitStarsService.loginOrRegister
+import main.kotlin.io.gitstars.GitStarsService.searchUserRepoByTags
 import main.kotlin.io.gitstars.GitStarsService.syncUserRepos
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
@@ -21,6 +22,9 @@ import org.http4k.filter.ServerFilters
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.format.Jackson.auto
+import org.http4k.lens.Query
+import org.http4k.lens.localDate
+import org.http4k.lens.string
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -41,6 +45,7 @@ fun main() {
     val oauthPersistence = InsecureCookieBasedOAuthPersistence("gitstars")
 
     val tagStringLens = Body.auto<TagInput>().toLens()
+    val tagSearchQueryLens = Query.string().multi.required("tag")
 
     val oauthProvider = OAuthProvider.gitHub(
         ApacheClient(),
@@ -74,6 +79,10 @@ fun main() {
             "/user/{userId}/tags" bind GET to { request ->
                 Response(OK).body(getAllTags(request.path("userId")?.toUUID()
                     ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
+            },
+                "/user/{userId}/repo/search" bind GET to  { request ->
+                    Response(OK).body(searchUserRepoByTags(request.path("userId")?.toUUID()
+                        ?: throw IllegalArgumentException("userId param cannot be left empty"), tagSearchQueryLens(request)).asJsonObject().asPrettyJsonString())
             },
             "/sync/{jobId}" bind GET to { request ->
                 Response(OK).body(getRepoSyncJobUsingId(request.path("jobId")?.toUUID()

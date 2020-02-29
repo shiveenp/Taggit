@@ -10,6 +10,7 @@ import main.kotlin.io.gitstars.DAO.getCurrentUserByGithubUserId
 import main.kotlin.io.gitstars.DAO.getGitStarUser
 import main.kotlin.io.gitstars.DAO.getMostRecentUnfinishedRepoSyncJob
 import main.kotlin.io.gitstars.DAO.getRepoSyncJobUsingId
+import main.kotlin.io.gitstars.DAO.getUserReposByTags
 import main.kotlin.io.gitstars.DAO.getUserToken
 import main.kotlin.io.gitstars.DAO.insertGitstarsUser
 import main.kotlin.io.gitstars.DAO.insertTagInRepo
@@ -84,4 +85,6 @@ object GitStarsService {
     fun getAllTags(userId: UUID): List<String> {
         return getAllDistinctTags(userId)
     }
+
+    fun searchUserRepoByTags(userId: UUID, tags: List<String>) = getUserReposByTags(userId, tags)
 }

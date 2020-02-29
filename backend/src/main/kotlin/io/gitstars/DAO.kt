@@ -4,6 +4,8 @@ import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.schema.*
 import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
+import org.http4k.format.Jackson.asJsonObject
+import org.http4k.format.Jackson.asA
 import java.time.LocalDateTime
 import java.util.*
 
@@ -155,6 +157,39 @@ object DAO {
                     metadata = row[RepoTable.metadata]
                 )
             }
+    }
+
+    /**
+     * Very 🌶 code
+     */
+    fun getUserReposByTags(userId: UUID, tags: List<String>): List<GitStarsRepo> {
+        val tagsJsonBQuery = tags.map {
+            "r.metadata @> '{\"tags\":[\"$it\"]}'"
+        }.joinToString( " OR " )
+
+        val sql = """
+                select * from repo r
+                where r.user_id = '$userId'
+                and ($tagsJsonBQuery)
+                order by r.repo_name asc
+            """.trimIndent()
+
+        println("sql is: $sql")
+        db.useConnection {conn ->
+            return conn.prepareStatement(sql).use {ps ->
+                ps.executeQuery().iterable().map {
+                    GitStarsRepo(
+                        id = it.getObject("id") as UUID,
+                        userId = it.getObject("user_id") as UUID,
+                        repoName = it.getString("repo_id"),
+                        githubLink = it.getString("repo_name"),
+                        githubDescription = it.getString("github_link"),
+                        ownerAvatarUrl = it.getString("github_description"),
+                        metadata = it.getString("metadata").asJsonObject().asA()
+                    )
+                }
+            }
+        }
     }
 
 
