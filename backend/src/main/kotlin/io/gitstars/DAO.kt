@@ -174,7 +174,6 @@ object DAO {
                 order by r.repo_name asc
             """.trimIndent()
 
-        println("sql is: $sql")
         db.useConnection {conn ->
             return conn.prepareStatement(sql).use {ps ->
                 ps.executeQuery().iterable().map {
