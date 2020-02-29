@@ -1,7 +1,7 @@
 <template>
     <div class="container is-fluid">
         <div class="columns is-multiline is-mobile">
-            <div class="column" v-for="repo in repoListToDisplay" v-bind:key="repo">
+            <div class="column" v-for="repo in repos" v-bind:key="repo">
                 <GithubRepo v-bind:id="repo.id"
                             v-bind:repo-name="repo.repoName"
                             v-bind:github-link="repo.githubLink"
@@ -15,7 +15,6 @@
 
 <script>
   import GithubRepo from "./GitHubRepo";
-  import axios from "axios";
   import {mapGetters} from "vuex";
 
   export default {
@@ -28,7 +27,7 @@
       }
     },
     computed: {
-      ...mapGetters(["activeTags"])
+      ...mapGetters(["repos", "activeTags"])
     },
     watch: {
       // eslint-disable-next-line no-unused-vars
@@ -44,17 +43,7 @@
     },
     methods: {
       fetchUserRepos() {
-        axios.get('http://localhost:9001/user/' + this.$route.params.userId + '/repos', {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(({data}) => {
-          this.reposList = data;
-          this.repoListToDisplay = data;
-        })
-            .catch(error => {
-              throw new Error(error);
-            });
+        this.$store.dispatch('fetchRepos', {userId: this.$route.params.userId});
       }
     },
 

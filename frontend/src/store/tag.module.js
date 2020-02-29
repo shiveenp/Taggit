@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 const state = {
   activeTags: []
 };
@@ -12,7 +10,6 @@ const getters = {
 
 const mutations = {
   activateTag(state, data) {
-    console.log(state.activeTags);
     if (!state.activeTags.includes(data)) {
       console.log(`state does not include ${data}`)
       state.activeTags.push(data)
@@ -27,7 +24,6 @@ const mutations = {
 
 const actions = {
   activateTag({commit}, data) {
-    console.log(`data is ${data}`)
     commit('fetchingData');
     commit('activateTag', data);
     commit('fetchFinished')
