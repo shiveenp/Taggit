@@ -180,10 +180,10 @@ object DAO {
                     GitStarsRepo(
                         id = it.getObject("id") as UUID,
                         userId = it.getObject("user_id") as UUID,
-                        repoName = it.getString("repo_id"),
-                        githubLink = it.getString("repo_name"),
-                        githubDescription = it.getString("github_link"),
-                        ownerAvatarUrl = it.getString("github_description"),
+                        repoName = it.getString("repo_name"),
+                        githubLink = it.getString("github_link"),
+                        githubDescription = it.getString("github_description"),
+                        ownerAvatarUrl = it.getString("owner_avatar_url"),
                         metadata = it.getString("metadata").asJsonObject().asA()
                     )
                 }
