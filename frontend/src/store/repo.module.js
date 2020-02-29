@@ -1,5 +1,6 @@
 import axios from "axios";
 import qs from "qs";
+import { TAGGIT_BASE_API_URL } from "../common/config";
 
 const state = {
   repos: [],
@@ -28,7 +29,7 @@ const mutations = {
 const actions = {
   fetchRepos({ commit }, params) {
     commit('fetchingData');
-    axios.get('http://localhost:9001/user/' + params.userId + '/repos', {
+    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos', {
       headers: {
         'Content-Type': 'application/json'
       }
