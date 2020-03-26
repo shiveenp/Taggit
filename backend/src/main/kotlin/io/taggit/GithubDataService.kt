@@ -18,7 +18,6 @@ private val logger = KotlinLogging.logger { }
 fun getUserData(token: String): GithubUser {
     val request = Request(Method.GET, "https://api.github.com/user").header("Authorization", "token $token")
     val userLens = Body.auto<GithubUser>().toLens()
-
     return userLens.extract(client(request))
 }
 
