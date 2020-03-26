@@ -1,5 +1,7 @@
-package main.kotlin.io.gitstars
+package main.kotlin.io.taggit
 
+import main.kotlin.io.taggit.common.GithubUser
+import main.kotlin.io.taggit.common.StargazingResponse
 import mu.KotlinLogging
 import org.http4k.client.ApacheClient
 import org.http4k.core.Body

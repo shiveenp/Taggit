@@ -1,5 +1,6 @@
-package main.kotlin.io.gitstars
+package main.kotlin.io.taggit
 
+import main.kotlin.io.taggit.common.*
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.schema.*
@@ -12,10 +13,10 @@ import java.util.*
 object DAO {
 
     val db = Database.connect(
-        url = "jdbc:postgresql://localhost:5432/gitstars",
+        url = AppProperties.dbUrl(AppProperties.env),
         driver = "org.postgresql.Driver",
-        user = "gitstars_admin",
-        password = "localadmin",
+        user = AppProperties.dbUser(AppProperties.env),
+        password = AppProperties.dbPassword(AppProperties.env),
         dialect = PostgreSqlDialect()
     )
 
@@ -60,37 +61,37 @@ object DAO {
 
     fun insertGitstarsUser(githubUser: GithubUser, token: String): Int {
         return UsersTable.insert {
-            it.id to UUID.randomUUID()
-            it.userName to githubUser.name
-            it.email to githubUser.email
-            it.password to "hello_it_me"
-            it.githubUserName to githubUser.login
-            it.githubUserId to githubUser.id
-            it.accessToken to token
-            it.tokenRefreshedAt to LocalDateTime.now()
-            it.lastLoginAt to LocalDateTime.now()
-            it.createdAt to LocalDateTime.now()
-            it.updatedAt to LocalDateTime.now()
+            UsersTable.id to UUID.randomUUID()
+            UsersTable.userName to githubUser.name
+            UsersTable.email to githubUser.email
+            UsersTable.password to "hello_it_me"
+            UsersTable.githubUserName to githubUser.login
+            UsersTable.githubUserId to githubUser.id
+            UsersTable.accessToken to token
+            UsersTable.tokenRefreshedAt to LocalDateTime.now()
+            UsersTable.lastLoginAt to LocalDateTime.now()
+            UsersTable.createdAt to LocalDateTime.now()
+            UsersTable.updatedAt to LocalDateTime.now()
         } as Int
     }
 
     fun updateGitstarsUser(githubUser: GithubUser, oldAccessToken: String, newAccessToken: String): Int {
         return if (oldAccessToken != newAccessToken) {
             UsersTable.update {
-                it.userName to githubUser.name
-                it.githubUserName to githubUser.login
-                it.githubUserId to githubUser.id
-                it.accessToken to newAccessToken
-                it.tokenRefreshedAt to LocalDateTime.now()
-                it.lastLoginAt to LocalDateTime.now()
-                it.updatedAt to LocalDateTime.now()
+                UsersTable.userName to githubUser.name
+                UsersTable.githubUserName to githubUser.login
+                UsersTable.githubUserId to githubUser.id
+                UsersTable.accessToken to newAccessToken
+                UsersTable.tokenRefreshedAt to LocalDateTime.now()
+                UsersTable.lastLoginAt to LocalDateTime.now()
+                UsersTable.updatedAt to LocalDateTime.now()
             }
         } else {
             UsersTable.update {
-                it.userName to githubUser.name
-                it.githubUserName to githubUser.login
-                it.githubUserId to githubUser.id
-                it.lastLoginAt to LocalDateTime.now()
+                UsersTable.userName to githubUser.name
+                UsersTable.githubUserName to githubUser.login
+                UsersTable.githubUserId to githubUser.id
+                UsersTable.lastLoginAt to LocalDateTime.now()
             }
         }
     }
@@ -131,14 +132,14 @@ object DAO {
 
     fun insertRepo(stargazingResponse: StargazingResponse, userId: UUID) {
         RepoTable.insert {
-            it.id to UUID.randomUUID()
-            it.userId to userId
-            it.repoId to stargazingResponse.id
-            it.repoName to stargazingResponse.name
-            it.githubLink to stargazingResponse.url
-            it.githubDescription to stargazingResponse.description
-            it.starCount to stargazingResponse.stargazersCount
-            it.ownerAvatarUrl to stargazingResponse.owner.avatarUrl
+            RepoTable.id to UUID.randomUUID()
+            RepoTable.userId to userId
+            RepoTable.repoId to stargazingResponse.id
+            RepoTable.repoName to stargazingResponse.name
+            RepoTable.githubLink to stargazingResponse.url
+            RepoTable.githubDescription to stargazingResponse.description
+            RepoTable.starCount to stargazingResponse.stargazersCount
+            RepoTable.ownerAvatarUrl to stargazingResponse.owner.avatarUrl
         }
     }
 
@@ -165,7 +166,7 @@ object DAO {
     fun getUserReposByTags(userId: UUID, tags: List<String>): List<GitStarsRepo> {
         val tagsJsonBQuery = tags.map {
             "r.metadata @> '{\"tags\":[\"$it\"]}'"
-        }.joinToString( " OR " )
+        }.joinToString(" OR ")
 
         val sql = """
                 select * from repo r
@@ -174,8 +175,8 @@ object DAO {
                 order by r.repo_name asc
             """.trimIndent()
 
-        db.useConnection {conn ->
-            return conn.prepareStatement(sql).use {ps ->
+        db.useConnection { conn ->
+            return conn.prepareStatement(sql).use { ps ->
                 ps.executeQuery().iterable().map {
                     GitStarsRepo(
                         id = it.getObject("id") as UUID,
@@ -206,8 +207,8 @@ object DAO {
             Metadata(tags = listOf(tag))
         }
         RepoTable.update {
-            it.metadata to metadataToSave
-            where { it.id eq repoId }
+            RepoTable.metadata to metadataToSave
+            where { RepoTable.id eq repoId }
         }
         return RepoTable.select()
             .where { RepoTable.id eq repoId }
@@ -240,8 +241,8 @@ object DAO {
             Metadata(tags = listOf())
         }
         RepoTable.update {
-            it.metadata to metadataToSave
-            where { it.id eq repoId }
+            RepoTable.metadata to metadataToSave
+            where { RepoTable.id eq repoId }
         }
         return RepoTable.select()
             .where { RepoTable.id eq repoId }
@@ -298,16 +299,16 @@ object DAO {
 
     fun completeRepoSyncJob(jobId: UUID) {
         RepoSyncJobsTable.update {
-            it.completed to true
+            RepoSyncJobsTable.completed to true
             where { RepoSyncJobsTable.id eq jobId }
         }
     }
 
     fun createNewRepoSyncJob(userId: UUID) {
         RepoSyncJobsTable.insert {
-            it.id to UUID.randomUUID()
-            it.userId to userId
-            it.completed to false
+            RepoSyncJobsTable.id to UUID.randomUUID()
+            RepoSyncJobsTable.userId to userId
+            RepoSyncJobsTable.completed to false
         }
     }
 

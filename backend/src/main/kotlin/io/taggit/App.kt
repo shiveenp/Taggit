@@ -1,15 +1,24 @@
 package io.gitstars
 
-import main.kotlin.io.gitstars.*
-import main.kotlin.io.gitstars.DAO.getRepoSyncJobUsingId
-import main.kotlin.io.gitstars.GitStarsService.addTag
-import main.kotlin.io.gitstars.GitStarsService.deleteTag
-import main.kotlin.io.gitstars.GitStarsService.getAllTags
-import main.kotlin.io.gitstars.GitStarsService.getUser
-import main.kotlin.io.gitstars.GitStarsService.getUserRepos
-import main.kotlin.io.gitstars.GitStarsService.loginOrRegister
-import main.kotlin.io.gitstars.GitStarsService.searchUserRepoByTags
-import main.kotlin.io.gitstars.GitStarsService.syncUserRepos
+import main.kotlin.io.taggit.DAO.getRepoSyncJobUsingId
+import main.kotlin.io.taggit.common.toUUID
+import main.kotlin.io.taggit.GitStarsService.addTag
+import main.kotlin.io.taggit.GitStarsService.deleteTag
+import main.kotlin.io.taggit.GitStarsService.getAllTags
+import main.kotlin.io.taggit.GitStarsService.getUser
+import main.kotlin.io.taggit.GitStarsService.getUserRepos
+import main.kotlin.io.taggit.GitStarsService.loginOrRegister
+import main.kotlin.io.taggit.GitStarsService.searchUserRepoByTags
+import main.kotlin.io.taggit.GitStarsService.syncUserRepos
+import main.kotlin.io.taggit.common.AppProperties.dbPassword
+import main.kotlin.io.taggit.common.AppProperties.dbUrl
+import main.kotlin.io.taggit.common.AppProperties.dbUser
+import main.kotlin.io.taggit.common.AppProperties.env
+import main.kotlin.io.taggit.common.AppProperties.githubClientId
+import main.kotlin.io.taggit.common.AppProperties.githubClientSecret
+import main.kotlin.io.taggit.common.TagInput
+import mu.KotlinLogging
+import org.flywaydb.core.Flyway
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
 import org.http4k.core.Method.GET
@@ -23,7 +32,6 @@ import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.Query
-import org.http4k.lens.localDate
 import org.http4k.lens.string
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -33,11 +41,17 @@ import org.http4k.security.OAuthProvider
 import org.http4k.security.gitHub
 import org.http4k.server.Netty
 import org.http4k.server.asServer
+import org.slf4j.LoggerFactory
 
 fun main() {
 
-    val githubClientId = System.getenv("GITHUB_CLIENT_ID")
-    val githubClientSecret = System.getenv("GITHUB_CLIENT_SECRET")
+    val logger = LoggerFactory.getLogger("main")
+    // run migrations
+    logger.info("Running database migrations...")
+    val flyway = Flyway.configure().dataSource(dbUrl(env), dbUser(env), dbPassword(env)).load()
+    flyway.migrate()
+    logger.info("Database migrations complete!")
+
     val port = 9001
 
     val callbackUri = Uri.of("http://localhost:$port/callback")
@@ -49,7 +63,7 @@ fun main() {
 
     val oauthProvider = OAuthProvider.gitHub(
         ApacheClient(),
-        Credentials(githubClientId, githubClientSecret),
+        Credentials(githubClientId(env), githubClientSecret(env)),
         callbackUri,
         oauthPersistence
     )
@@ -58,7 +72,6 @@ fun main() {
         routes(
             callbackUri.path bind GET to oauthProvider.callback,
             "/login" bind GET to oauthProvider.authFilter.then {
-                println(it)
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
                 Response(TEMPORARY_REDIRECT).header("location", "http://localhost:8080/user/$savedUserId")
@@ -80,9 +93,9 @@ fun main() {
                 Response(OK).body(getAllTags(request.path("userId")?.toUUID()
                     ?: throw IllegalArgumentException("userId param cannot be left empty")).asJsonObject().asPrettyJsonString())
             },
-                "/user/{userId}/repo/search" bind GET to  { request ->
-                    Response(OK).body(searchUserRepoByTags(request.path("userId")?.toUUID()
-                        ?: throw IllegalArgumentException("userId param cannot be left empty"), tagSearchQueryLens(request)).asJsonObject().asPrettyJsonString())
+            "/user/{userId}/repo/search" bind GET to { request ->
+                Response(OK).body(searchUserRepoByTags(request.path("userId")?.toUUID()
+                    ?: throw IllegalArgumentException("userId param cannot be left empty"), tagSearchQueryLens(request)).asJsonObject().asPrettyJsonString())
             },
             "/sync/{jobId}" bind GET to { request ->
                 Response(OK).body(getRepoSyncJobUsingId(request.path("jobId")?.toUUID()

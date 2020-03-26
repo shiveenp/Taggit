@@ -1,4 +1,4 @@
-package main.kotlin.io.gitstars
+package main.kotlin.io.taggit
 
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper

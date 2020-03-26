@@ -1,4 +1,4 @@
-package main.kotlin.io.gitstars
+package main.kotlin.io.taggit.common
 
 import java.util.*
 
