@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:9.6
+    restart: always
+    environment:
+      - DATABASE_USER=gitstars_admin
+      - DATABASE_PASSWORD=testing
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+      - ./init:/docker-entrypoint-initdb.d/
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+
+  backend:
+    image: taggit/backend
+    ports:
+      - "9001:9001"
+    networks:
+      - default
+    environment:
+      - GITHUB_CLIENT_ID=
+      - GITHUB_CLIENT_SECRET=
+      - DATABASE_URL=jdbc:postgresql://db/taggit
+      - DATABASE_USER=gitstars_admin
+      - DATABASE_PASSWORD=testing
+    depends_on:
+      - db
+
+volumes:
+  db-data:

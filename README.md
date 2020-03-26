@@ -57,9 +57,10 @@ Once done, fire up the frontend using vue cli:
 npm run serve
 ```
 
-Now you can navigate to http://localhost:8080 on your borwser to see the login window. That screen will take you through the github Oauth login.
+Now you can navigate to http://localhost:8080 on your browser to see the login window. That screen will take you through the github Oauth login.
 
-(Make sure you have the)
+(Make sure you the right github credentials in the backend before trying to use the frontend, contact the project maintainer to get them)
+
 Once done, you can use the `Resync` button to sync all your repos to your local Taggit database.
 
 ### Compiles and minifies for production

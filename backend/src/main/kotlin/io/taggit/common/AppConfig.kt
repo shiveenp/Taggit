@@ -6,9 +6,9 @@ import org.http4k.lens.string
 
 object AppProperties {
     val env = Environment.ENV
-    val githubClientId = EnvironmentKey.required("github.client.id")
-    val githubClientSecret = EnvironmentKey.required("github.client.secret")
-    val dbUrl = EnvironmentKey.required("database.url")
-    val dbUser = EnvironmentKey.required("database.user")
-    val dbPassword = EnvironmentKey.string().required("database.password")
+    val githubClientId = EnvironmentKey.required("GITHUB_CLIENT_ID")
+    val githubClientSecret = EnvironmentKey.required("GITHUB_CLIENT_SECRET")
+    val dbUrl = EnvironmentKey.required("DATABASE_URL")
+    val dbUser = EnvironmentKey.required("DATABASE_USER")
+    val dbPassword = EnvironmentKey.string().required("DATABASE_PASSWORD")
 }

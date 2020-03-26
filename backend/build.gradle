@@ -16,6 +16,7 @@ buildscript {
 
 plugins {
     id "org.flywaydb.flyway" version "6.1.3"
+    id 'com.google.cloud.tools.jib' version '2.1.0'
 }
 
 apply plugin: 'java'
@@ -58,9 +59,20 @@ dependencies {
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5432/gitstars'
+    url = 'jdbc:postgresql://localhost:5432/taggit'
     user = 'gitstars_admin'
-    password = 'localadmin'
+    password = 'testing'
 }
 
-//mainClassName = 'org.http4k.example.AppKt'
+jib {
+    from {
+        image = 'openjdk:alpine'
+    }
+    to {
+        image = 'taggit/backend'
+        tags = ['latest']
+    }
+    container {
+        mainClass = 'io.gitstars.AppKt'
+    }
+}
