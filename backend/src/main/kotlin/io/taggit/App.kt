@@ -55,7 +55,7 @@ fun main() {
 
     val port = System.getenv("PORT")?.toInt() ?: 9001
 
-    val callbackUri = Uri.of("http://localhost:$port/callback")
+    val callbackUri = Uri.of("https://taggit-api.herokuapp.com/callback")
 
     val oauthPersistence = InsecureCookieBasedOAuthPersistence("taggit")
 
