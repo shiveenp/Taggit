@@ -27,9 +27,9 @@ services:
     environment:
       - GITHUB_CLIENT_ID=04a50fefd14124ecfb84
       - GITHUB_CLIENT_SECRET=6c303d21b089bad1df7611d7602e417f8c53a686
-      - DATABASE_URL=jdbc:postgresql://db/taggit
-      - DATABASE_USER=gitstars_admin
-      - DATABASE_PASSWORD=testing
+      - JDBC_DATABASE_URL=jdbc:postgresql://db/taggit
+      - JDBC_DATABASE_USER=gitstars_admin
+      - JDBC_DATABASE_PASSWORD=testing
     depends_on:
       - db
 

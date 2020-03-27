@@ -8,7 +8,7 @@ object AppProperties {
     val env = Environment.ENV
     val githubClientId = EnvironmentKey.required("GITHUB_CLIENT_ID")
     val githubClientSecret = EnvironmentKey.required("GITHUB_CLIENT_SECRET")
-    val dbUrl = EnvironmentKey.required("DATABASE_URL")
-    val dbUser = EnvironmentKey.required("DATABASE_USER")
-    val dbPassword = EnvironmentKey.required("DATABASE_PASSWORD")
+    val dbUrl = EnvironmentKey.required("JDBC_DATABASE_URL")
+    val dbUser = EnvironmentKey.required("JDBC_DATABASE_USERNAME")
+    val dbPassword = EnvironmentKey.required("JDBC_DATABASE_PASSWORD")
 }
