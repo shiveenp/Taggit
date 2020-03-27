@@ -50,7 +50,7 @@ First navigate into the frontend directory and install all the node modules:
 ```shell script
 npm install
 ```
-
+              `
 Once done, fire up the frontend using vue cli:
 
 ```shell script

@@ -1,4 +1,4 @@
-package io.gitstars
+package io.taggit
 
 import main.kotlin.io.taggit.DAO.getRepoSyncJobUsingId
 import main.kotlin.io.taggit.common.toUUID
