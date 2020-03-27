@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 /backend/.gradle
+/backend/build
 /dist
 
 # local env files
