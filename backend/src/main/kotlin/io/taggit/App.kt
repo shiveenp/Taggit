@@ -1,4 +1,4 @@
-package io.gitstars
+package io.taggit
 
 import main.kotlin.io.taggit.DAO.getRepoSyncJobUsingId
 import main.kotlin.io.taggit.common.toUUID
@@ -16,6 +16,7 @@ import main.kotlin.io.taggit.common.AppProperties.dbUser
 import main.kotlin.io.taggit.common.AppProperties.env
 import main.kotlin.io.taggit.common.AppProperties.githubClientId
 import main.kotlin.io.taggit.common.AppProperties.githubClientSecret
+import main.kotlin.io.taggit.common.GithubUser
 import main.kotlin.io.taggit.common.TagInput
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
@@ -45,9 +46,9 @@ import org.slf4j.LoggerFactory
 
 fun main() {
 
-    val logger = LoggerFactory.getLogger("main")
+    val logger = LoggerFactory.getLogger(GithubUser::class.java)
     // run migrations
-    logger.info("Running database migrations...")
+    logger.info ("Running database migrations...")
     val flyway = Flyway.configure().dataSource(dbUrl(env), dbUser(env), dbPassword(env)).load()
     flyway.migrate()
     logger.info("Database migrations complete!")

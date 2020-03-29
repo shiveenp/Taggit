@@ -17,17 +17,19 @@ services:
       - default
 
   backend:
-    image: taggit/backend
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "9001:9001"
     networks:
       - default
     environment:
-      - GITHUB_CLIENT_ID=
-      - GITHUB_CLIENT_SECRET=
-      - DATABASE_URL=jdbc:postgresql://db/taggit
-      - DATABASE_USER=gitstars_admin
-      - DATABASE_PASSWORD=testing
+      - GITHUB_CLIENT_ID=04a50fefd14124ecfb84
+      - GITHUB_CLIENT_SECRET=6c303d21b089bad1df7611d7602e417f8c53a686
+      - JDBC_DATABASE_URL=jdbc:postgresql://db/taggit
+      - JDBC_DATABASE_USER=gitstars_admin
+      - JDBC_DATABASE_PASSWORD=testing
     depends_on:
       - db
 
