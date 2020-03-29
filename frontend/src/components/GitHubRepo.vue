@@ -34,6 +34,7 @@
 
 <script>
   import axios from "axios";
+  import { TAGGIT_BASE_API_URL } from "../common/config";
 
   export default {
     data() {
@@ -46,7 +47,7 @@
     name: "GithubRepo",
     methods: {
       saveTag(tag) {
-        axios.post('http://localhost:9001/repo/' + this.id + '/tag',
+        axios.post(TAGGIT_BASE_API_URL + '/repo/' + this.id + '/tag',
             {
               tag
             },
@@ -55,7 +56,7 @@
             })
       },
       removeTag(tag) {
-        axios.delete('http://localhost:9001/repo/' + this.id + '/tag/' + tag,
+        axios.delete(TAGGIT_BASE_API_URL + '/repo/' + this.id + '/tag/' + tag,
             {
               'Content-Type': 'application/json'
             })

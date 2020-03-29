@@ -36,7 +36,7 @@
   import Repos from "./Repos";
   import TagsList from "./TagsList";
   import axios from "axios";
-  import { TAGGIT_BASE_API_URL } from "../common/config";
+  import {TAGGIT_BASE_API_URL} from "../common/config";
 
   export default {
     name: "User",
@@ -49,7 +49,7 @@
         this.$store.dispatch('fetchUser', {userId: this.$route.params.userId});
       },
       resyncRepos() {
-        axios.post(TAGGIT_BASE_API_URL + "/user/" + this.$route.params.userId + "/sync" )
+        axios.post(TAGGIT_BASE_API_URL + "/user/" + this.$route.params.userId + "/sync")
       }
     },
     mounted() {

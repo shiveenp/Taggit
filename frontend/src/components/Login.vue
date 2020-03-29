@@ -16,7 +16,7 @@
   export default {
     methods: {
       login: function () {
-        window.location.href = 'http://localhost:9001/login';
+        window.location.href = 'https://taggit-api.herokuapp.com/login';
       }
     }
   };

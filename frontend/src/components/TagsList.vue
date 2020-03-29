@@ -9,6 +9,7 @@
 <script>
   import TagButton from "./TagButton";
   import axios from "axios";
+  import { TAGGIT_BASE_API_URL } from "../common/config";
 
   export default {
     name: "TagsList",
@@ -20,7 +21,7 @@
     },
     methods: {
       fetchAllTags() {
-        axios.get('http://localhost:9001/user/' + this.$route.params.userId + '/tags', {
+        axios.get(TAGGIT_BASE_API_URL + '/user/' + this.$route.params.userId + '/tags', {
           headers: {
             'Content-Type': 'application/json'
           }

@@ -46,7 +46,7 @@ const actions = {
   fetchReposUsingTags({ commit }, params) {
     commit('fetchingData');
     console.log(`params are ${JSON.stringify(params)}`);
-    axios.get('http://localhost:9001/user/' + params.userId + '/repo/search', {
+    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repo/search', {
       params: {
         tag: params.tags
       },
