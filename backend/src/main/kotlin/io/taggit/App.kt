@@ -75,7 +75,7 @@ fun main() {
             "/login" bind GET to oauthProvider.authFilter.then {
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                Response(TEMPORARY_REDIRECT).header("location", "http://localhost:8080/user/$savedUserId")
+                Response(TEMPORARY_REDIRECT).header("location", "https://taggit-ui.herokuapp.com/user/$savedUserId")
             },
             "/user/{userId}" bind GET to { request ->
                 Response(OK).body(getUser(request.path("userId")?.toUUID()
