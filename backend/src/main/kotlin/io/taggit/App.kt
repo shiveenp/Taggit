@@ -52,11 +52,11 @@ fun main() {
     flyway.migrate()
     logger.info("Database migrations complete!")
 
-    val port = 9001
+    val port = System.getenv("PORT")?.toInt() ?: 9001
 
-    val callbackUri = Uri.of("http://localhost:$port/callback")
+    val callbackUri = Uri.of("https://taggit-api.herokuapp.com/callback")
 
-    val oauthPersistence = InsecureCookieBasedOAuthPersistence("gitstars")
+    val oauthPersistence = InsecureCookieBasedOAuthPersistence("taggit")
 
     val tagStringLens = Body.auto<TagInput>().toLens()
     val tagSearchQueryLens = Query.string().multi.required("tag")

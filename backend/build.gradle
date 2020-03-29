@@ -59,9 +59,9 @@ dependencies {
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5432/taggit'
-    user = 'gitstars_admin'
-    password = 'testing'
+    url = 'jdbc:postgresql://ec2-35-168-54-239.compute-1.amazonaws.com:5432/d3li6llit1fh6g'
+    user = 'esutupwdthnkkf'
+    password = '900036aaaadd4c747fd975b4b048df611488702dbba933cff7a5df0aeb3edb32'
 }
 
 jib {
