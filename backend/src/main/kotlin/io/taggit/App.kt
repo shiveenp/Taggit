@@ -1,7 +1,6 @@
 package io.taggit
 
 import main.kotlin.io.taggit.DAO.getRepoSyncJobUsingId
-import main.kotlin.io.taggit.common.toUUID
 import main.kotlin.io.taggit.GitStarsService.addTag
 import main.kotlin.io.taggit.GitStarsService.deleteTag
 import main.kotlin.io.taggit.GitStarsService.getAllTags
@@ -16,9 +15,11 @@ import main.kotlin.io.taggit.common.AppProperties.dbUser
 import main.kotlin.io.taggit.common.AppProperties.env
 import main.kotlin.io.taggit.common.AppProperties.githubClientId
 import main.kotlin.io.taggit.common.AppProperties.githubClientSecret
+import main.kotlin.io.taggit.common.AppProperties.rootServiceUrl
+import main.kotlin.io.taggit.common.AppProperties.uiURL
 import main.kotlin.io.taggit.common.GithubUser
 import main.kotlin.io.taggit.common.TagInput
-import mu.KotlinLogging
+import main.kotlin.io.taggit.common.toUUID
 import org.flywaydb.core.Flyway
 import org.http4k.client.ApacheClient
 import org.http4k.core.*
@@ -55,7 +56,7 @@ fun main() {
 
     val port = System.getenv("PORT")?.toInt() ?: 9001
 
-    val callbackUri = Uri.of("https://taggit-api.herokuapp.com/callback")
+    val callbackUri = Uri.of( "${rootServiceUrl(env) ?: "http://locahost:9001"}/callback")
 
     val oauthPersistence = InsecureCookieBasedOAuthPersistence("taggit")
 
@@ -75,7 +76,7 @@ fun main() {
             "/login" bind GET to oauthProvider.authFilter.then {
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                Response(TEMPORARY_REDIRECT).header("location", "https://taggit-ui.herokuapp.com/user/$savedUserId")
+                Response(TEMPORARY_REDIRECT).header("location", "${uiURL(env) ?: "http://localhost:8080}"}/user/$savedUserId")
             },
             "/user/{userId}" bind GET to { request ->
                 Response(OK).body(getUser(request.path("userId")?.toUUID()
