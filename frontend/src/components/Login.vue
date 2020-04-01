@@ -13,10 +13,12 @@
 </template>
 
 <script>
+  import { TAGGIT_BASE_API_URL } from "../common/config";
+
   export default {
     methods: {
       login: function () {
-        window.location.href = 'https://taggit-api.herokuapp.com/login';
+        window.location.href = TAGGIT_BASE_API_URL + '/login';
       }
     }
   };

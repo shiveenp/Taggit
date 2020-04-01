@@ -56,9 +56,9 @@ fun main() {
 
     val port = System.getenv("PORT")?.toInt() ?: 9001
 
-    val callbackUri = Uri.of( "${rootServiceUrl(env) ?: "http://locahost:9001"}/callback")
+    val callbackUri = Uri.of( "${rootServiceUrl(env) ?: "http://localhost:9001"}/callback")
 
-    val oauthPersistence = InsecureCookieBasedOAuthPersistence("taggit")
+    val oauthPersistence = InsecureCookieBasedOAuthPersistence("taggit-dev")
 
     val tagStringLens = Body.auto<TagInput>().toLens()
     val tagSearchQueryLens = Query.string().multi.required("tag")
@@ -72,11 +72,14 @@ fun main() {
 
     val app: HttpHandler =
         routes(
+            "/" bind GET to {
+              Response(OK).body("Welcome to Taggit API")
+            },
             callbackUri.path bind GET to oauthProvider.callback,
             "/login" bind GET to oauthProvider.authFilter.then {
                 val token = oauthPersistence.retrieveToken(it)?.value?.substringBefore("&scope")?.split("=")?.last()
                 val savedUserId = loginOrRegister(token!!)
-                Response(TEMPORARY_REDIRECT).header("location", "${uiURL(env) ?: "http://localhost:8080}"}/user/$savedUserId")
+                Response(TEMPORARY_REDIRECT).header("location", "${uiURL(env) ?: "http://localhost:8080"}/user/$savedUserId")
             },
             "/user/{userId}" bind GET to { request ->
                 Response(OK).body(getUser(request.path("userId")?.toUUID()
