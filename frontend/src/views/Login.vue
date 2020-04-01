@@ -17,7 +17,7 @@
   export default {
     methods: {
       login: function () {
-        window.location.href = `${TAGGIT_BASE_API_URL}/login`;
+        window.location = `${TAGGIT_BASE_API_URL}/login`;
       }
     }
   };
