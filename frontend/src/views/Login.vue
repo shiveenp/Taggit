@@ -3,8 +3,7 @@
     <div class="container">
       <h1>Welcome To Taggit</h1>
       <form class="form">
-        <b-button size="is-medium"
-                  icon-left="github-circle" v-on:click="login">
+        <b-button size="is-medium" icon-left="github-circle" @click="login">
           Login with Github
         </b-button>
       </form>
@@ -18,7 +17,7 @@
   export default {
     methods: {
       login: function () {
-        window.location.href = TAGGIT_BASE_API_URL + '/login';
+        window.location.href = `${TAGGIT_BASE_API_URL}/login`;
       }
     }
   };

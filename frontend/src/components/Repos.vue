@@ -1,13 +1,15 @@
 <template>
     <div class="container is-fluid">
         <div class="columns is-multiline is-mobile">
-            <div class="column" v-for="repo in reposToDisplay" v-bind:key="repo">
-                <GithubRepo v-bind:id="repo.id"
-                            v-bind:repo-name="repo.repoName"
-                            v-bind:github-link="repo.githubLink"
-                            v-bind:github-description="repo.githubDescription"
-                            v-bind:owner-avatar-url="repo.ownerAvatarUrl"
-                            v-bind:metadata="repo.metadata"></GithubRepo>
+            <div class="column" v-for="repo in reposToDisplay" :key="repo.id">
+                <GithubRepo 
+                  :id="repo.id"
+                  :repo-name="repo.repoName"
+                  :github-link="repo.githubLink"
+                  :github-description="repo.githubDescription"
+                  :owner-avatar-url="repo.ownerAvatarUrl"
+                  :metadata="repo.metadata"
+                />
             </div>
         </div>
     </div>
@@ -38,7 +40,6 @@
         this.$store.dispatch('fetchRepos', {userId: this.$route.params.userId});
       }
     },
-
     created() {
       this.fetchUserRepos();
     }
