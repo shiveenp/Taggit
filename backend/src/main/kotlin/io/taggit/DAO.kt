@@ -103,7 +103,7 @@ object DAO {
                 GitstarUser(
                     id = row[UsersTable.id]!!,
                     userName = row[UsersTable.userName]!!,
-                    email = row[UsersTable.email]!!,
+                    email = row[UsersTable.email],
                     githubUserName = row[UsersTable.githubUserName]!!,
                     githubUserId = row[UsersTable.githubUserId]!!,
                     accessToken = row[UsersTable.accessToken]!!,

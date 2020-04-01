@@ -24,13 +24,13 @@ data class GithubUser(
     val id: Long,
     val login: String,
     val name: String,
-    val email: String
+    val email: String?
 )
 
 data class GitstarUser(
     val id: UUID,
     val userName: String,
-    val email: String,
+    val email: String?,
     val githubUserName: String,
     val githubUserId: Long,
     val accessToken: String,
