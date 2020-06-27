@@ -2,6 +2,8 @@
 
 Taggit allows users to connect their github accounts and manage their starred repos.
 
+Note: Currently this app is under active maintenance 🚧 while I migrate the backend to Spring.
+
 ## Motivation
 
 This project was borne out of my own need to be able organise several OSS projects that I routinely stared on github and have them allocated within neat tags. Think of it like [Pocket](https://getpocket.com/) but for git repositories.
