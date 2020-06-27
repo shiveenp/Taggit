@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taggit
+    username: gitstars_admin
+    password: testing
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId:
+            clientSecret:
+  output:
+    ansi:
+      enabled: always
+  flyway:
+    enabled: true
