@@ -12,5 +12,17 @@ class Router {
         "/".nest {
             GET("signin", taggitHandler::loginOrSignup)
         }
+
+        // Todo: delete api needs to be added yet
+        "/user".nest {
+            GET("", taggitHandler::getUser)
+            PUT("", taggitHandler::updateUser)
+            POST
+        }
+
+        "/repos".nest {
+            GET("", taggitHandler::getRepos)
+        }
+
     }
 }

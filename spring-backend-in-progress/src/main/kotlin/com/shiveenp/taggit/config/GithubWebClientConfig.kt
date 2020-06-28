@@ -1,4 +1,4 @@
-package com.shiveenp.taggit
+package com.shiveenp.taggit.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

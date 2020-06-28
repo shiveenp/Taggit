@@ -1,5 +1,12 @@
-package com.shiveenp.taggit
+package com.shiveenp.taggit.db
 
+import com.shiveenp.taggit.models.GithubUser
+import com.shiveenp.taggit.models.Metadata
+import com.shiveenp.taggit.models.TaggitRepo
+import com.shiveenp.taggit.models.TaggitUser
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType
+import org.hibernate.annotations.Type
+import org.hibernate.annotations.TypeDef
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -43,5 +50,35 @@ data class TaggitUserEntity(
                 updatedAt = LocalDateTime.now()
             )
         }
+    }
+}
+
+@Entity
+@Table(name = "repos")
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
+data class TaggitRepoEntity(
+    @Id
+    val id: UUID,
+    val userId: UUID,
+    val repoId: Long,
+    val repoName: String,
+    val githubLink: String,
+    val githubDescription: String?,
+    val ownerAvatarUrl: String,
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    val metadata: Metadata?
+) {
+    fun toDto(): TaggitRepo {
+        TaggitRepo(
+            id = this.id,
+            userId = this.userId,
+            repoId = this.repoId,
+            repoName = this.repoName,
+            githubLink = this.githubLink,
+            githubDescription = this.githubDescription,
+            ownerAvatarUrl = this.ownerAvatarUrl,
+            metadata = this.metadata
+        )
     }
 }
