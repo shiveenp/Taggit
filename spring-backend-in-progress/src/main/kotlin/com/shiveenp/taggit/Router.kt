@@ -17,7 +17,7 @@ class Router {
         "/user".nest {
             GET("", taggitHandler::getUser)
             PUT("", taggitHandler::updateUser)
-            POST
+            GET("/sync", taggitHandler::syncUserRepos)
         }
 
         "/repos".nest {

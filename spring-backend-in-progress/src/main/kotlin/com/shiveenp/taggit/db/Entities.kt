@@ -70,7 +70,7 @@ data class TaggitRepoEntity(
     val metadata: Metadata?
 ) {
     fun toDto(): TaggitRepo {
-        TaggitRepo(
+        return TaggitRepo(
             id = this.id,
             userId = this.userId,
             repoId = this.repoId,

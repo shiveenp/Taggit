@@ -6,7 +6,7 @@ import com.shiveenp.taggit.models.TaggitUser
 import com.shiveenp.taggit.db.TaggitUserEntity
 import com.shiveenp.taggit.models.TaggitRepo
 import com.shiveenp.taggit.models.TaggitUserUpdateDto
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import org.springframework.data.domain.PageRequest
@@ -16,6 +16,7 @@ import java.util.*
 
 @Service
 class TaggitService(private val githubService: GithubService,
+                    private val repoSyncService: RepoSyncService,
                     private val userRepository: TaggitUserRepository,
                     private val repoRepository: TaggitRepoRepository) {
 
@@ -53,11 +54,11 @@ class TaggitService(private val githubService: GithubService,
         return repoRepository.findAllByUserId(userId, pageRequest).map { it.toDto() }.asFlow()
     }
 
-    suspend fun syncUserRepos(userId: UUID) {
+    suspend fun syncUserRepos() {
         coroutineScope {
-            val currentSyncdRepoIds = repoRepository.findAllByUserId(userId)
-                .map { it.id }
-
+            launch {
+                repoSyncService.syncUserStargazingData()
+            }
         }
     }
 

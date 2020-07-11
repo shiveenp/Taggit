@@ -32,12 +32,17 @@ class TaggitHandler(private val service: TaggitService) {
         return ok().bodyAndAwait(service.getUserStarredRepos(loggedInUser!!, page?.toIntOrNull(), size?.toIntOrNull()))
     }
 
+    suspend fun syncUserRepos(req: ServerRequest): ServerResponse {
+        service.syncUserRepos()
+        return ok().bodyValueAndAwait("Accepted")
+    }
+
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {
         req.awaitSession().attributes.putIfAbsent(USER_ID_SESSION_KEY, userId)
     }
 
     private suspend fun getUserIdFromRequestSession(req: ServerRequest): UUID? {
-        return req.awaitSession().attributes[USER_ID_SESSION_KEY].toString().toUUID()
+        return req.awaitSession().attributes[USER_ID_SESSION_KEY]?.toString()?.toUUID()
     }
 
     companion object {
