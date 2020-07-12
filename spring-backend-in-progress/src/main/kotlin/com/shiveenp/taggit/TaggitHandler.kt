@@ -2,10 +2,12 @@ package com.shiveenp.taggit
 
 import com.shiveenp.taggit.service.TaggitService
 import com.shiveenp.taggit.util.toUUID
+import kotlinx.coroutines.*
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import java.util.*
+import kotlin.coroutines.coroutineContext
 
 
 @Component
@@ -33,8 +35,7 @@ class TaggitHandler(private val service: TaggitService) {
     }
 
     suspend fun syncUserRepos(req: ServerRequest): ServerResponse {
-        service.syncUserRepos()
-        return ok().bodyValueAndAwait("Accepted")
+        return ok().bodyValueAndAwait(service.syncUserRepos())
     }
 
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {

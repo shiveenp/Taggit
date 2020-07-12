@@ -4,6 +4,7 @@ import com.shiveenp.taggit.models.GithubStargazingResponse
 import com.shiveenp.taggit.models.GithubUser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -20,13 +21,13 @@ class GithubService(private val githubClient: WebClient) {
     }
 
 
-    fun requestGithubStargazingResponseOrNull(page: Int): Flow<ResponseEntity<MutableList<GithubStargazingResponse>>> {
+    fun requestGithubStargazingResponseOrNull(page: Int): ResponseEntity<MutableList<GithubStargazingResponse>>? {
         val uri = "$GITHUB_STARGAZING_BASE_URI?page=$page"
         return githubClient.get()
             .uri(uri)
             .retrieve()
             .toEntityList(GithubStargazingResponse::class.java)
-            .asFlow()
+            .block()
     }
 
     companion object {

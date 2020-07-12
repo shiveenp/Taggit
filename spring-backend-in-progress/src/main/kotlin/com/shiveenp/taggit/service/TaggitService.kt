@@ -54,13 +54,7 @@ class TaggitService(private val githubService: GithubService,
         return repoRepository.findAllByUserId(userId, pageRequest).map { it.toDto() }.asFlow()
     }
 
-    suspend fun syncUserRepos() {
-        coroutineScope {
-            launch {
-                repoSyncService.syncUserStargazingData()
-            }
-        }
-    }
+    suspend fun syncUserRepos(): String = repoSyncService.syncUserStargazingData()
 
     companion object {
         const val DEFAULT_REPO_RESULT_PAGE_NUMBER = 1
