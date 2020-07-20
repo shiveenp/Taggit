@@ -15,7 +15,7 @@
     "babel-preset-vue": "^2.0.2",
     "buefy": "^0.8.8",
     "core-js": "^3.4.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "node-sass": "^4.13.0",
     "qs": "^6.9.1",
     "sass-loader": "^8.0.0",
