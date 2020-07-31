@@ -1,8 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/taggit
-    username: gitstars_admin
-    password: testing
+    username: postgres
   security:
     oauth2:
       client:
