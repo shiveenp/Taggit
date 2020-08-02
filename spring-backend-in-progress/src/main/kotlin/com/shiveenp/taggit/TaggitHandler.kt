@@ -57,6 +57,17 @@ class TaggitHandler(private val service: TaggitService) {
         }
     }
 
+    suspend fun deleteTagFromRepo(req: ServerRequest): ServerResponse {
+        val repoId = req.pathVariable("repoId").toUUID()
+        val tagToRemove = req.pathVariable("tag")
+        val updatedRepo = service.deleteTagFromRepo(repoId, tagToRemove)
+        return if (updatedRepo != null) {
+            ok().bodyValueAndAwait(updatedRepo)
+        } else {
+            notFound().buildAndAwait()
+        }
+    }
+
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {
         req.awaitSession().attributes.putIfAbsent(USER_ID_SESSION_KEY, userId)
     }

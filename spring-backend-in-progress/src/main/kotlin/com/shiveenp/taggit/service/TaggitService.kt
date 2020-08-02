@@ -9,7 +9,6 @@ import com.shiveenp.taggit.models.Metadata
 import com.shiveenp.taggit.models.TagInput
 import com.shiveenp.taggit.models.TaggitRepo
 import com.shiveenp.taggit.models.TaggitUserUpdateDto
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import org.springframework.data.domain.PageRequest
@@ -71,12 +70,12 @@ class TaggitService(private val githubService: GithubService,
 
     suspend fun addRepoTag(repoId: UUID, tagInput: TagInput): TaggitRepoEntity? {
         return repoRepository.findByIdOrNull(repoId)?.let {
-            val updatedMetadata = updateMetadataWithTag(it.metadata, tagInput.tag)
+            val updatedMetadata = addTagToMetadata(it.metadata, tagInput.tag)
             repoRepository.save(it.withUpdated(metadata = updatedMetadata))
         }
     }
 
-    private fun updateMetadataWithTag(metadata: Metadata?, tag: String): Metadata {
+    private fun addTagToMetadata(metadata: Metadata?, tag: String): Metadata {
         return if (metadata != null) {
             val updatedTags = metadata.tags.toMutableSet()
                 .apply {
@@ -87,6 +86,25 @@ class TaggitService(private val githubService: GithubService,
             Metadata(tags = listOf(tag))
         }
     }
+
+    fun deleteTagFromRepo(repoId: UUID, tag: String) {
+        repoRepository.findByIdOrNull(repoId)?.let {
+            val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tag)
+            repoRepository.save(it.withUpdated(metadata = updatedMetadata))
+        }
+    }
+
+    private fun deleteTagFromMetadataOrNull(metadata: Metadata?, tag: String): Metadata? {
+        return metadata?.let {
+            val updatedTags = it.tags.apply {
+                this.toMutableList().run {
+                    this.remove(tag)
+                }
+            }
+            Metadata(tags = updatedTags)
+        }
+    }
+
 
     companion object {
         const val DEFAULT_REPO_RESULT_PAGE_NUMBER = 1
