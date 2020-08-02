@@ -54,7 +54,7 @@ class TaggitService(private val githubService: GithubService,
         return repoRepository.findAllByUserId(userId, pageRequest).map { it.toDto() }.asFlow()
     }
 
-    suspend fun syncUserRepos(): String = repoSyncService.syncUserStargazingData()
+    suspend fun syncUserRepos(userId: UUID): Flow<String> = repoSyncService.syncUserStargazingData(userId)
 
     companion object {
         const val DEFAULT_REPO_RESULT_PAGE_NUMBER = 1

@@ -35,7 +35,8 @@ class TaggitHandler(private val service: TaggitService) {
     }
 
     suspend fun syncUserRepos(req: ServerRequest): ServerResponse {
-        return ok().bodyValueAndAwait(service.syncUserRepos())
+        val loggedInUser = getUserIdFromRequestSession(req)
+        return ok().bodyAndAwait(service.syncUserRepos(loggedInUser!!))
     }
 
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {

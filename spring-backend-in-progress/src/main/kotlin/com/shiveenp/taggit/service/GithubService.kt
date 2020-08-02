@@ -13,6 +13,8 @@ import org.springframework.web.reactive.function.client.awaitBody
 @Service
 class GithubService(private val githubClient: WebClient) {
 
+    private val webClient = WebClient.create()
+
     suspend fun getUserData(): GithubUser {
         return githubClient.get()
             .uri("https://api.github.com/user")
@@ -25,6 +27,16 @@ class GithubService(private val githubClient: WebClient) {
         val uri = "$GITHUB_STARGAZING_BASE_URI?page=$page"
         return githubClient.get()
             .uri(uri)
+            .retrieve()
+            .toEntityList(GithubStargazingResponse::class.java)
+            .block()
+    }
+
+    fun getStargazingDataOrNull(authToken: String, page: Int): ResponseEntity<MutableList<GithubStargazingResponse>>? {
+        val uri = "$GITHUB_STARGAZING_BASE_URI?page=$page"
+        return webClient.get()
+            .uri(uri)
+            .header("Authorization", "token $authToken")
             .retrieve()
             .toEntityList(GithubStargazingResponse::class.java)
             .block()

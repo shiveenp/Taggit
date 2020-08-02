@@ -1,9 +1,6 @@
 package com.shiveenp.taggit.db
 
-import com.shiveenp.taggit.models.GithubUser
-import com.shiveenp.taggit.models.Metadata
-import com.shiveenp.taggit.models.TaggitRepo
-import com.shiveenp.taggit.models.TaggitUser
+import com.shiveenp.taggit.models.*
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
@@ -54,7 +51,7 @@ data class TaggitUserEntity(
 }
 
 @Entity
-@Table(name = "repos")
+@Table(name = "repo")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
 data class TaggitRepoEntity(
     @Id
@@ -64,6 +61,7 @@ data class TaggitRepoEntity(
     val repoName: String,
     val githubLink: String,
     val githubDescription: String?,
+    val starCount: Int,
     val ownerAvatarUrl: String,
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
@@ -80,5 +78,21 @@ data class TaggitRepoEntity(
             ownerAvatarUrl = this.ownerAvatarUrl,
             metadata = this.metadata
         )
+    }
+
+    companion object {
+        fun from(userId: UUID, response: GithubStargazingResponse): TaggitRepoEntity {
+            return TaggitRepoEntity(
+                id = UUID.randomUUID(),
+                userId = userId,
+                repoId = response.id,
+                repoName = response.name,
+                githubLink = response.url,
+                githubDescription = response.description,
+                starCount = response.stargazersCount,
+                ownerAvatarUrl = response.owner.avatarUrl,
+                metadata = null
+            )
+        }
     }
 }

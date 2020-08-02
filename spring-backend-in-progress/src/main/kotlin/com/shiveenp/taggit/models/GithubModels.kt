@@ -1,6 +1,7 @@
 package com.shiveenp.taggit.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.shiveenp.taggit.db.TaggitRepoEntity
 
 data class GithubUser(
     val id: Long,
