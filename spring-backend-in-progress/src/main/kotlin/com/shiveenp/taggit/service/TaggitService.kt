@@ -105,6 +105,14 @@ class TaggitService(private val githubService: GithubService,
         }
     }
 
+    suspend fun searchUserReposByTags(userId: UUID, tags: List<String>): Flow<TaggitRepoEntity> {
+        val tagsJsonBQuery = tags.map {
+            "r.metadata @> '{\"tags\":[\"$it\"]}'"
+        }.joinToString(" OR ")
+        return repoRepository.findAllByMetadataTags(userId, tagsJsonBQuery).asFlow()
+
+    }
+
 
     companion object {
         const val DEFAULT_REPO_RESULT_PAGE_NUMBER = 1

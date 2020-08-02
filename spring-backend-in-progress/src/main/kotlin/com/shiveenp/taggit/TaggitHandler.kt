@@ -68,6 +68,12 @@ class TaggitHandler(private val service: TaggitService) {
         }
     }
 
+    suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
+        val loggedInUser = getUserIdFromRequestSession(req)
+        val tags = req.queryParams().get("tag") ?: emptyList()
+        return ok().bodyAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
+    }
+
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {
         req.awaitSession().attributes.putIfAbsent(USER_ID_SESSION_KEY, userId)
     }
