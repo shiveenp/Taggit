@@ -1,10 +1,12 @@
 package com.shiveenp.taggit
 
+import com.shiveenp.taggit.models.TagInput
 import com.shiveenp.taggit.service.TaggitService
 import com.shiveenp.taggit.util.toUUID
 import kotlinx.coroutines.*
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
+import org.springframework.web.reactive.function.server.ServerResponse.notFound
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import java.util.*
 import kotlin.coroutines.coroutineContext
@@ -34,9 +36,25 @@ class TaggitHandler(private val service: TaggitService) {
         return ok().bodyAndAwait(service.getUserStarredRepos(loggedInUser!!, page?.toIntOrNull(), size?.toIntOrNull()))
     }
 
-    suspend fun syncUserRepos(req: ServerRequest): ServerResponse {
+    suspend fun syncRepos(req: ServerRequest): ServerResponse {
         val loggedInUser = getUserIdFromRequestSession(req)
         return ok().bodyAndAwait(service.syncUserRepos(loggedInUser!!))
+    }
+
+    suspend fun getRepoTags(req: ServerRequest): ServerResponse {
+        val loggedInUser = getUserIdFromRequestSession(req)
+        return ok().bodyAndAwait(service.getDistinctTags(loggedInUser!!))
+    }
+
+    suspend fun addTagToRepo(req: ServerRequest): ServerResponse {
+        val repoId = req.pathVariable("repoId").toUUID()
+        val tagInput = req.awaitBody<TagInput>()
+        val updatedRepo = service.addRepoTag(repoId, tagInput)
+        return if (updatedRepo != null) {
+            ok().bodyValueAndAwait(updatedRepo)
+        } else {
+            notFound().buildAndAwait()
+        }
     }
 
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {

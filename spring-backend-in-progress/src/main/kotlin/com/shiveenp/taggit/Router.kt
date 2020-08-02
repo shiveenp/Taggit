@@ -17,12 +17,13 @@ class Router {
         "/user".nest {
             GET("", taggitHandler::getUser)
             PUT("", taggitHandler::updateUser)
-            GET("/sync", taggitHandler::syncUserRepos)
         }
 
-        "/repos".nest {
+        "/repo".nest {
             GET("", taggitHandler::getRepos)
+            POST("/sync", taggitHandler::syncRepos)
+            GET("/tags", taggitHandler::getRepoTags)
+            POST("{repoId}/tag", taggitHandler::addTagToRepo)
         }
-
     }
 }

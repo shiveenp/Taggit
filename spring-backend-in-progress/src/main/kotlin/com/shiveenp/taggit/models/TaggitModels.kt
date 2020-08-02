@@ -65,6 +65,10 @@ data class TaggitRepo(
     val metadata: Metadata?
 )
 
+data class TagInput(
+    val tag: String
+)
+
 data class RepoSyncJob(
     val id: UUID,
     val userId: UUID,

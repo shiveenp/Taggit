@@ -80,6 +80,12 @@ data class TaggitRepoEntity(
         )
     }
 
+    fun withUpdated(metadata: Metadata? = null): TaggitRepoEntity {
+        return this.copy(
+            metadata = metadata ?: this.metadata
+        )
+    }
+
     companion object {
         fun from(userId: UUID, response: GithubStargazingResponse): TaggitRepoEntity {
             return TaggitRepoEntity(

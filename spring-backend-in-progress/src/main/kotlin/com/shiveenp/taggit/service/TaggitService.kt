@@ -1,9 +1,12 @@
 package com.shiveenp.taggit.service
 
+import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.models.TaggitUser
 import com.shiveenp.taggit.db.TaggitUserEntity
+import com.shiveenp.taggit.models.Metadata
+import com.shiveenp.taggit.models.TagInput
 import com.shiveenp.taggit.models.TaggitRepo
 import com.shiveenp.taggit.models.TaggitUserUpdateDto
 import kotlinx.coroutines.*
@@ -55,6 +58,35 @@ class TaggitService(private val githubService: GithubService,
     }
 
     suspend fun syncUserRepos(userId: UUID): Flow<String> = repoSyncService.syncUserStargazingData(userId)
+
+    suspend fun getDistinctTags(userId: UUID): Flow<String> {
+        return repoRepository.findAllByUserId(userId)
+            .mapNotNull {
+                it.metadata
+            }
+            .flatMap {
+                it.tags
+            }.toSortedSet().asFlow()
+    }
+
+    suspend fun addRepoTag(repoId: UUID, tagInput: TagInput): TaggitRepoEntity? {
+        return repoRepository.findByIdOrNull(repoId)?.let {
+            val updatedMetadata = updateMetadataWithTag(it.metadata, tagInput.tag)
+            repoRepository.save(it.withUpdated(metadata = updatedMetadata))
+        }
+    }
+
+    private fun updateMetadataWithTag(metadata: Metadata?, tag: String): Metadata {
+        return if (metadata != null) {
+            val updatedTags = metadata.tags.toMutableSet()
+                .apply {
+                    this.add(tag)
+                }
+            Metadata(tags = updatedTags.toList())
+        } else {
+            Metadata(tags = listOf(tag))
+        }
+    }
 
     companion object {
         const val DEFAULT_REPO_RESULT_PAGE_NUMBER = 1
