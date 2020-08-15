@@ -1,28 +1,30 @@
 package com.shiveenp.taggit
 
+import com.shiveenp.taggit.config.ExternalProperties
 import com.shiveenp.taggit.models.TagInput
 import com.shiveenp.taggit.service.TaggitService
 import com.shiveenp.taggit.util.toUUID
-import kotlinx.coroutines.*
+import com.shiveenp.taggit.util.toUri
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
-import org.springframework.web.reactive.function.server.ServerResponse.notFound
-import org.springframework.web.reactive.function.server.ServerResponse.ok
+import org.springframework.web.reactive.function.server.ServerResponse.*
 import java.util.*
-import kotlin.coroutines.coroutineContext
 
 
 @Component
-class TaggitHandler(private val service: TaggitService) {
+class TaggitHandler(
+    private val service: TaggitService,
+    private val externalProperties: ExternalProperties) {
 
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
-        return ok().bodyValueAndAwait(service.loginOrRegister().also {
-            saveUserIdInRequestSession(req, it.id)
-        })
+        val user = service.loginOrRegister()
+        saveUserIdInRequestSession(req, user.id)
+        return temporaryRedirect("${externalProperties.uiUrl}/user/${user.id}".toUri()).buildAndAwait()
     }
 
     suspend fun getUser(req: ServerRequest): ServerResponse {
-        return ok().bodyValueAndAwait(service.getUser(getUserIdFromRequestSession(req)!!)!!)
+        val userId = req.pathVariable("userId")
+        return ok().bodyValueAndAwait(service.getUser(userId.toUUID())!!)
     }
 
     suspend fun updateUser(req: ServerRequest): ServerResponse {
@@ -75,10 +77,14 @@ class TaggitHandler(private val service: TaggitService) {
     }
 
     private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {
+        println("persistence session id is: ${req.awaitSession().id}")
         req.awaitSession().attributes.putIfAbsent(USER_ID_SESSION_KEY, userId)
     }
 
     private suspend fun getUserIdFromRequestSession(req: ServerRequest): UUID? {
+        println("retrieval session id is: ${req.awaitSession().id}")
+        val userId = req.awaitSession().attributes[USER_ID_SESSION_KEY]?.toString()
+        println("user id string is: $userId")
         return req.awaitSession().attributes[USER_ID_SESSION_KEY]?.toString()?.toUUID()
     }
 

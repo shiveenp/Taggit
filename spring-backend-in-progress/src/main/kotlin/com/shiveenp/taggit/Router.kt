@@ -1,6 +1,7 @@
 package com.shiveenp.taggit
 
 import org.springframework.context.annotation.Bean
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.server.coRouter
 
@@ -15,8 +16,8 @@ class Router {
 
         // Todo: delete api needs to be added yet
         "/user".nest {
-            GET("", taggitHandler::getUser)
-            PUT("", taggitHandler::updateUser)
+            GET("/{userId}", taggitHandler::getUser)
+            PUT("/{userId}", taggitHandler::updateUser)
         }
 
         "/repo".nest {
