@@ -1,7 +1,9 @@
-package com.shiveenp.taggit
+package com.shiveenp.taggit.api
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.shiveenp.taggit.config.ExternalProperties
 import com.shiveenp.taggit.models.TagInput
+import com.shiveenp.taggit.service.RedisService
 import com.shiveenp.taggit.service.TaggitService
 import com.shiveenp.taggit.util.toUUID
 import com.shiveenp.taggit.util.toUri
@@ -14,12 +16,13 @@ import java.util.*
 @Component
 class TaggitHandler(
     private val service: TaggitService,
-    private val externalProperties: ExternalProperties) {
+    private val externalProperties: ExternalProperties,
+    private val redis: RedisService) {
 
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
         val user = service.loginOrRegister()
-        saveUserIdInRequestSession(req, user.id)
-        return temporaryRedirect("${externalProperties.uiUrl}/user/${user.id}".toUri()).buildAndAwait()
+        val token = saveUserIdAndGenerateSessionToken(user.id)
+        return temporaryRedirect("${externalProperties.uiUrl}/user/${user.id}/token?token=$token".toUri()).buildAndAwait()
     }
 
     suspend fun getUser(req: ServerRequest): ServerResponse {
@@ -76,9 +79,10 @@ class TaggitHandler(
         return ok().bodyAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
     }
 
-    private suspend fun saveUserIdInRequestSession(req: ServerRequest, userId: UUID) {
-        println("persistence session id is: ${req.awaitSession().id}")
-        req.awaitSession().attributes.putIfAbsent(USER_ID_SESSION_KEY, userId)
+    private suspend fun saveUserIdAndGenerateSessionToken(userId: UUID): String {
+        val token = NanoIdUtils.randomNanoId()
+        redis.put(token, userId.toString())
+        return token
     }
 
     private suspend fun getUserIdFromRequestSession(req: ServerRequest): UUID? {

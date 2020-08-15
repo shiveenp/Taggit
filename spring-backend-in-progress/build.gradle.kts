@@ -24,21 +24,28 @@ dependencies {
     implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
-    // session
+    implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
+
+    // utils
+    implementation("redis.clients:jedis:3.2.0")
     implementation("com.vladmihalcea:hibernate-types-52:2.2.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.flywaydb:flyway-core:6.1.3")
+    implementation("io.github.microutils:kotlin-logging:1.7.7")
+    implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+
+    // kotlin
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("org.flywaydb:flyway-core:6.1.3")
-    implementation("org.springframework.session:spring-session-core")
-    implementation("io.github.microutils:kotlin-logging:1.7.7")
     runtimeOnly("org.postgresql:postgresql")
+
+    // testing
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }

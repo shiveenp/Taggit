@@ -1,7 +1,6 @@
-package com.shiveenp.taggit
+package com.shiveenp.taggit.api
 
 import org.springframework.context.annotation.Bean
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.server.coRouter
 
