@@ -3,12 +3,8 @@ package com.shiveenp.taggit.service
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
-import com.shiveenp.taggit.models.TaggitUser
 import com.shiveenp.taggit.db.TaggitUserEntity
-import com.shiveenp.taggit.models.Metadata
-import com.shiveenp.taggit.models.TagInput
-import com.shiveenp.taggit.models.TaggitRepo
-import com.shiveenp.taggit.models.TaggitUserUpdateDto
+import com.shiveenp.taggit.models.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import org.springframework.data.domain.PageRequest
@@ -56,7 +52,7 @@ class TaggitService(private val githubService: GithubService,
         return repoRepository.findAllByUserId(userId, pageRequest).map { it.toDto() }.asFlow()
     }
 
-    suspend fun syncUserRepos(userId: UUID): Flow<String> = repoSyncService.syncUserStargazingData(userId)
+    suspend fun syncUserRepos(userId: UUID): Flow<MutableList<GithubStargazingResponse>> = repoSyncService.syncUserStargazingData(userId)
 
     suspend fun getDistinctTags(userId: UUID): Flow<String> {
         return repoRepository.findAllByUserId(userId)

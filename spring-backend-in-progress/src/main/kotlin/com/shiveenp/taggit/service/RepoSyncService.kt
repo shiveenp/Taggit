@@ -3,11 +3,8 @@ package com.shiveenp.taggit.service
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
 import org.springframework.http.ResponseEntity
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service
 import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
-import javax.xml.bind.JAXBElement
 
 /**
  * This is the main service responsible for all the nitty gritty of repo sync logic that
@@ -33,14 +29,15 @@ class RepoSyncService(val githubService: GithubService,
 
     private val logger = KotlinLogging.logger { }
 
-    suspend fun syncUserStargazingData(userId: UUID): Flow<String> {
+    suspend fun syncUserStargazingData(userId: UUID): Flow<MutableList<GithubStargazingResponse>> {
         return ReactiveSecurityContextHolder.getContext()
             .flatMap {
                 var token = "";
                 val authToken = it.authentication as OAuth2AuthenticationToken
                 clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name).doOnSuccess {
                     token = it.accessToken.tokenValue
-                }.subscribe()
+                }
+                println("token is $token")
                 val startPage = 1
                 val userStarredReposList = mutableListOf<GithubStargazingResponse>()
                 var stargazingResponse = githubService.getStargazingDataOrNull(token, startPage)
@@ -62,13 +59,11 @@ class RepoSyncService(val githubService: GithubService,
                     taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
                 }
             }
-            .subscribeOn(Schedulers.boundedElastic())
-            .thenReturn("Finished")
             .asFlow()
     }
 
-    fun getLastPageFromStargazingResponseOrNull(reponse: ResponseEntity<MutableList<GithubStargazingResponse>>): Int? {
-        val linksHeader = reponse.headers["Link"]?.get(0)
+    fun getLastPageFromStargazingResponseOrNull(response: ResponseEntity<MutableList<GithubStargazingResponse>>): Int? {
+        val linksHeader = response.headers["Link"]?.get(0)
         return if (linksHeader != null) {
             val lastPageLink = linksHeader.split(",").last()
             GithubService.githubLinkMatchRegex.find(lastPageLink)?.groupValues?.last()?.substringAfter("=")?.toInt()

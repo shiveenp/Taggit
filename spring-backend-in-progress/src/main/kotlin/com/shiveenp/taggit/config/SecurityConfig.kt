@@ -21,8 +21,10 @@ class SecurityConfiguration {
                 exchanges.pathMatchers("/signin").authenticated()
                 exchanges.anyExchange().permitAll()
             }
-            .oauth2Login(withDefaults())
-            .oauth2Client(withDefaults())
+            .oauth2Login()
+            .and()
+            .oauth2Client()
+            .and()
             .cors()
             .and()
             .csrf()

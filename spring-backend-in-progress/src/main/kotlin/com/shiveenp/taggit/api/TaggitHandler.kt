@@ -26,29 +26,29 @@ class TaggitHandler(
     }
 
     suspend fun getUser(req: ServerRequest): ServerResponse {
-        val userId = req.pathVariable("userId")
-        return ok().bodyValueAndAwait(service.getUser(userId.toUUID())!!)
+        val userId = getUserIdFromRequest(req)
+        return ok().bodyValueAndAwait(service.getUser(userId)!!)
     }
 
     suspend fun updateUser(req: ServerRequest): ServerResponse {
-        return ok().bodyValueAndAwait(service.updateUser(getUserIdFromRequestSession(req)!!, req.awaitBody()))
+        return ok().bodyValueAndAwait(service.updateUser(getUserIdFromRequest(req), req.awaitBody()))
     }
 
     suspend fun getRepos(req: ServerRequest): ServerResponse {
-        val loggedInUser = getUserIdFromRequestSession(req)
+        val userId = getUserIdFromRequest(req)
         val page = req.queryParamOrNull("page")
         val size = req.queryParamOrNull("size")
-        return ok().bodyAndAwait(service.getUserStarredRepos(loggedInUser!!, page?.toIntOrNull(), size?.toIntOrNull()))
+        return ok().bodyAndAwait(service.getUserStarredRepos(userId, page?.toIntOrNull(), size?.toIntOrNull()))
     }
 
     suspend fun syncRepos(req: ServerRequest): ServerResponse {
-        val loggedInUser = getUserIdFromRequestSession(req)
-        return ok().bodyAndAwait(service.syncUserRepos(loggedInUser!!))
+        val userId = getUserIdFromRequest(req)
+        return ok().bodyAndAwait(service.syncUserRepos(userId))
     }
 
     suspend fun getRepoTags(req: ServerRequest): ServerResponse {
-        val loggedInUser = getUserIdFromRequestSession(req)
-        return ok().bodyAndAwait(service.getDistinctTags(loggedInUser!!))
+        val userId = getUserIdFromRequest(req)
+        return ok().bodyAndAwait(service.getDistinctTags(userId))
     }
 
     suspend fun addTagToRepo(req: ServerRequest): ServerResponse {
@@ -66,15 +66,11 @@ class TaggitHandler(
         val repoId = req.pathVariable("repoId").toUUID()
         val tagToRemove = req.pathVariable("tag")
         val updatedRepo = service.deleteTagFromRepo(repoId, tagToRemove)
-        return if (updatedRepo != null) {
-            ok().bodyValueAndAwait(updatedRepo)
-        } else {
-            notFound().buildAndAwait()
-        }
+        return ok().bodyValueAndAwait(updatedRepo)
     }
 
     suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
-        val loggedInUser = getUserIdFromRequestSession(req)
+        val loggedInUser = getUserIdFromRequest(req)
         val tags = req.queryParams().get("tag") ?: emptyList()
         return ok().bodyAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
     }
@@ -85,15 +81,10 @@ class TaggitHandler(
         return token
     }
 
-    private suspend fun getUserIdFromRequestSession(req: ServerRequest): UUID? {
-        println("retrieval session id is: ${req.awaitSession().id}")
-        val userId = req.awaitSession().attributes[USER_ID_SESSION_KEY]?.toString()
-        println("user id string is: $userId")
-        return req.awaitSession().attributes[USER_ID_SESSION_KEY]?.toString()?.toUUID()
-    }
+    private suspend fun getUserIdFromRequest(req: ServerRequest) = req.pathVariable(USER_ID_PATH_VARIABLE).toUUID()
 
     companion object {
-        const val USER_ID_SESSION_KEY = "userId"
+        const val USER_ID_PATH_VARIABLE = "userId"
     }
 }
 
