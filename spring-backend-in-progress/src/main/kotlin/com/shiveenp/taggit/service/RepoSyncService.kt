@@ -33,6 +33,7 @@ class RepoSyncService(val githubService: GithubService,
     private val logger = KotlinLogging.logger { }
 
     suspend fun syncUserStargazingData(userId: UUID): Flow<MutableList<GithubStargazingResponse>> {
+
         return ReactiveSecurityContextHolder.getContext()
             .flatMap {
                 var token = "";

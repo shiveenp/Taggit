@@ -12,7 +12,11 @@ class RedisService {
         redis.set(key.toString(), value.toString())
     }
 
-    fun get(key: Any): String {
-        return redis.get(key.toString())
+    fun getOrNull(key: String): String? {
+        return if (redis.exists(key)) {
+            redis.get(key.toString())
+        } else {
+            null
+        }
     }
 }

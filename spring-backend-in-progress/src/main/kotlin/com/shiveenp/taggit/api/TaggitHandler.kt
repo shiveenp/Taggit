@@ -1,27 +1,25 @@
 package com.shiveenp.taggit.api
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.shiveenp.taggit.config.ExternalProperties
 import com.shiveenp.taggit.models.TagInput
-import com.shiveenp.taggit.service.RedisService
 import com.shiveenp.taggit.service.TaggitService
+import com.shiveenp.taggit.service.TokenHandlerService
 import com.shiveenp.taggit.util.toUUID
 import com.shiveenp.taggit.util.toUri
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.*
-import java.util.*
 
 
 @Component
 class TaggitHandler(
     private val service: TaggitService,
     private val externalProperties: ExternalProperties,
-    private val redis: RedisService) {
+    private val tokenHandlerService: TokenHandlerService) {
 
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
         val userAndToken = service.loginOrRegister()
-        val token = saveSessionData(userAndToken.first.id, userAndToken.second)
+        val token = tokenHandlerService.saveUserIdAndGetSessionToken(userAndToken.first.id, userAndToken.second)
         return temporaryRedirect("${externalProperties.uiUrl}/user/${userAndToken.first.id}/token?token=$token".toUri()).buildAndAwait()
     }
 
@@ -75,20 +73,10 @@ class TaggitHandler(
         return ok().bodyAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
     }
 
-    private suspend fun saveSessionData(userId: UUID, githubToken: String): String {
-        val sessionToken = NanoIdUtils.randomNanoId()
-        redis.put(userId.toString(), generateSessionAndAuthTokenCombined(sessionToken, githubToken))
-        return sessionToken
-    }
-
     private suspend fun getUserIdFromRequest(req: ServerRequest) = req.pathVariable(USER_ID_PATH_VARIABLE).toUUID()
 
     companion object {
         const val USER_ID_PATH_VARIABLE = "userId"
-        const val SESSION_AND_AUTH_TOKEN_DELIMITER = ":"
-        fun generateSessionAndAuthTokenCombined(sessionToken: String, githubToken: String): String {
-            return "$sessionToken$SESSION_AND_AUTH_TOKEN_DELIMITER$githubToken"
-        }
     }
 }
 
