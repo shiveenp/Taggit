@@ -3,8 +3,10 @@ package com.shiveenp.taggit.service
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
 import org.springframework.http.ResponseEntity
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service
 import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
+import javax.xml.bind.JAXBElement
 
 /**
  * This is the main service responsible for all the nitty gritty of repo sync logic that
@@ -37,7 +40,6 @@ class RepoSyncService(val githubService: GithubService,
                 clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name).doOnSuccess {
                     token = it.accessToken.tokenValue
                 }
-                println("token is $token")
                 val startPage = 1
                 val userStarredReposList = mutableListOf<GithubStargazingResponse>()
                 var stargazingResponse = githubService.getStargazingDataOrNull(token, startPage)

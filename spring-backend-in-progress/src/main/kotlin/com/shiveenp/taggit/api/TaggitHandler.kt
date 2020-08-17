@@ -20,9 +20,9 @@ class TaggitHandler(
     private val redis: RedisService) {
 
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
-        val user = service.loginOrRegister()
-        val token = saveUserIdAndGenerateSessionToken(user.id)
-        return temporaryRedirect("${externalProperties.uiUrl}/user/${user.id}/token?token=$token".toUri()).buildAndAwait()
+        val userAndToken = service.loginOrRegister()
+        val token = saveSessionData(userAndToken.first.id, userAndToken.second)
+        return temporaryRedirect("${externalProperties.uiUrl}/user/${userAndToken.first.id}/token?token=$token".toUri()).buildAndAwait()
     }
 
     suspend fun getUser(req: ServerRequest): ServerResponse {
@@ -75,16 +75,20 @@ class TaggitHandler(
         return ok().bodyAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
     }
 
-    private suspend fun saveUserIdAndGenerateSessionToken(userId: UUID): String {
-        val token = NanoIdUtils.randomNanoId()
-        redis.put(token, userId.toString())
-        return token
+    private suspend fun saveSessionData(userId: UUID, githubToken: String): String {
+        val sessionToken = NanoIdUtils.randomNanoId()
+        redis.put(userId.toString(), generateSessionAndAuthTokenCombined(sessionToken, githubToken))
+        return sessionToken
     }
 
     private suspend fun getUserIdFromRequest(req: ServerRequest) = req.pathVariable(USER_ID_PATH_VARIABLE).toUUID()
 
     companion object {
         const val USER_ID_PATH_VARIABLE = "userId"
+        const val SESSION_AND_AUTH_TOKEN_DELIMITER = ":"
+        fun generateSessionAndAuthTokenCombined(sessionToken: String, githubToken: String): String {
+            return "$sessionToken$SESSION_AND_AUTH_TOKEN_DELIMITER$githubToken"
+        }
     }
 }
 

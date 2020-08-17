@@ -7,21 +7,31 @@ import com.shiveenp.taggit.db.TaggitUserEntity
 import com.shiveenp.taggit.models.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
+import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 @Service
 class TaggitService(private val githubService: GithubService,
                     private val repoSyncService: RepoSyncService,
                     private val userRepository: TaggitUserRepository,
-                    private val repoRepository: TaggitRepoRepository) {
+                    private val repoRepository: TaggitRepoRepository,
+                    private val clientService: ReactiveOAuth2AuthorizedClientService) {
 
-    suspend fun loginOrRegister(): TaggitUser {
+    suspend fun loginOrRegister(): Pair<TaggitUser, String> {
         val githubUser = githubService.getUserData()
         val existingUser = userRepository.findByGithubUserId(githubUser.id)
-        return if (existingUser != null) {
+        val user = if (existingUser != null) {
             userRepository.save(existingUser
                 .toDto()
                 .updateUsing(githubUser)
@@ -30,6 +40,21 @@ class TaggitService(private val githubService: GithubService,
         } else {
             userRepository.save(TaggitUserEntity.from(githubUser)).toDto()
         }
+        val githubToken = getGithubOauthToken()
+        return (user to githubToken)
+    }
+
+    suspend fun getGithubOauthToken(): String {
+        return ReactiveSecurityContextHolder.getContext().flatMap {
+            var token = "";
+            val authToken = it.authentication as OAuth2AuthenticationToken
+            clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name)
+                .doOnSuccess {
+                token = it.accessToken.tokenValue
+            }.subscribe()
+            token.toMono()
+        }.asFlow()
+            .first()
     }
 
     suspend fun getUser(userId: UUID): TaggitUser? {
