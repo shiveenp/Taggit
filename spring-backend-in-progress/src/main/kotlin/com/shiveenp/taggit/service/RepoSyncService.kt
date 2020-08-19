@@ -3,8 +3,10 @@ package com.shiveenp.taggit.service
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
+import com.shiveenp.taggit.util.GithubAuthException
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -28,41 +30,46 @@ import javax.xml.bind.JAXBElement
 @Service
 class RepoSyncService(val githubService: GithubService,
                       val clientService: ReactiveOAuth2AuthorizedClientService,
-                      val taggitRepoRepository: TaggitRepoRepository) {
+                      val taggitRepoRepository: TaggitRepoRepository,
+                      val tokenHandlerService: TokenHandlerService) {
 
     private val logger = KotlinLogging.logger { }
 
-    suspend fun syncUserStargazingData(userId: UUID): Flow<MutableList<GithubStargazingResponse>> {
+    suspend fun syncUserStargazingData(userId: UUID): Flow<GithubStargazingResponse> {
+        logger.info { "Syncing repos for user: $userId" }
+        val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
+        return if (token != null) {
+            val allRepos = getUserStarredRepos(token)
+            allRepos.forEach {
+                // FixMe: Add deduplicater in case repos have already been syncd
+                taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
+            }
+            allRepos.asFlow()
+        } else {
+            throw GithubAuthException("Unable to sync repos for $userId")
+        }
+    }
 
-        return ReactiveSecurityContextHolder.getContext()
-            .flatMap {
-                var token = "";
-                val authToken = it.authentication as OAuth2AuthenticationToken
-                clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name).doOnSuccess {
-                    token = it.accessToken.tokenValue
-                }
-                val startPage = 1
-                val userStarredReposList = mutableListOf<GithubStargazingResponse>()
-                var stargazingResponse = githubService.getStargazingDataOrNull(token, startPage)
-                if (stargazingResponse != null) {
-                    userStarredReposList.addAll(stargazingResponse.body ?: emptyList())
-                    val lastPage = getLastPageFromStargazingResponseOrNull(stargazingResponse)
-                    if (lastPage != null) {
-                        for (i in 2..lastPage) {
-                            stargazingResponse = githubService.getStargazingDataOrNull(token, i)
-                            if (stargazingResponse != null) {
-                                userStarredReposList.addAll(stargazingResponse.body ?: emptyList())
-                            }
-                        }
+    fun getUserStarredRepos(token: String): List<GithubStargazingResponse> {
+        val startPage = 1
+        val userStarredReposList = mutableListOf<GithubStargazingResponse>()
+        var stargazingResponse = githubService.getStargazingDataOrNull(token, startPage)
+        if (stargazingResponse != null) {
+            logger.debug { "Stargazing response received..." }
+            userStarredReposList.addAll(stargazingResponse.body ?: emptyList())
+            logger.debug { "Syncing Page 1" }
+            val lastPage = getLastPageFromStargazingResponseOrNull(stargazingResponse)
+            if (lastPage != null) {
+                for (i in 2..lastPage) {
+                    logger.debug { "Syncing Page $i" }
+                    stargazingResponse = githubService.getStargazingDataOrNull(token, i)
+                    if (stargazingResponse != null) {
+                        userStarredReposList.addAll(stargazingResponse.body ?: emptyList())
                     }
                 }
-                userStarredReposList.toMono()
-            }.doOnNext {
-                it.forEach {
-                    taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
-                }
             }
-            .asFlow()
+        }
+        return userStarredReposList
     }
 
     fun getLastPageFromStargazingResponseOrNull(response: ResponseEntity<MutableList<GithubStargazingResponse>>): Int? {

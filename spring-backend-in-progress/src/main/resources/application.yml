@@ -22,3 +22,8 @@ spring:
 
 external:
   uiUrl: http://localhost:8081
+
+logging:
+  level:
+    root: info
+    com.shiveenp.taggit: debug

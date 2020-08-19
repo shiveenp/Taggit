@@ -1,5 +1,6 @@
 package com.shiveenp.taggit.api
 
+import com.shiveenp.taggit.config.SessionKeyFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.server.coRouter
@@ -8,7 +9,7 @@ import org.springframework.web.reactive.function.server.coRouter
 class Router {
 
     @Bean
-    fun routes(taggitHandler: TaggitHandler) = coRouter {
+    fun routes(taggitHandler: TaggitHandler, sessionKeyFilter: SessionKeyFilter) = coRouter {
         "/".nest {
             GET("signin", taggitHandler::loginOrSignup)
         }
@@ -20,12 +21,12 @@ class Router {
 
             "/repos".nest {
                 GET("", taggitHandler::getRepos)
-                POST("/sync", taggitHandler::syncRepos)
+                GET("/sync", taggitHandler::syncRepos)
                 GET("/tags", taggitHandler::getRepoTags)
                 POST("{repoId}/tag", taggitHandler::addTagToRepo)
                 DELETE("{repoId}/tag/{tag}", taggitHandler::deleteTagFromRepo)
                 POST("/search", taggitHandler::searchRepoByTags)
             }
         }
-    }
+    }.filter(sessionKeyFilter)
 }
