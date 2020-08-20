@@ -9,9 +9,7 @@ export default {
     persistTokenAndRedirectToHome() {
       let userId = this.$route.params.userId
       let token = this.$route.query.token
-      console.log(`userId is ${userId}`)
-      console.log(`token is ${token}`)
-      localStorage.setItem("taggit-user-session-token", token)
+      localStorage.setItem("taggit-session-token", token)
       this.$router.push(`/user/${userId}`)
     }
   },

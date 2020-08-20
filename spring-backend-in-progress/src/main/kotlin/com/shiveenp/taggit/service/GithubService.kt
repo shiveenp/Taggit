@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
+import reactor.core.publisher.Mono
 
 @Service
 class GithubService(private val githubClient: WebClient) {
@@ -22,15 +23,6 @@ class GithubService(private val githubClient: WebClient) {
             .awaitBody()
     }
 
-
-    fun requestGithubStargazingResponseOrNull(page: Int): ResponseEntity<MutableList<GithubStargazingResponse>>? {
-        val uri = "$GITHUB_STARGAZING_BASE_URI?page=$page"
-        return githubClient.get()
-            .uri(uri)
-            .retrieve()
-            .toEntityList(GithubStargazingResponse::class.java)
-            .block()
-    }
 
     fun getStargazingDataOrNull(authToken: String, page: Int): ResponseEntity<MutableList<GithubStargazingResponse>>? {
         val uri = "$GITHUB_STARGAZING_BASE_URI?page=$page"

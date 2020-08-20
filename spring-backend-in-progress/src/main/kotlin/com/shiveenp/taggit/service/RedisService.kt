@@ -1,22 +1,30 @@
 package com.shiveenp.taggit.service
 
 import org.springframework.stereotype.Service
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisPool
+import redis.clients.jedis.JedisPoolConfig
+
 
 @Service
 class RedisService {
 
-    private val redis = Jedis()
+    private val jedisPool = JedisPool(JedisPoolConfig(), "localhost")
 
     fun put(key: String, value: String) {
-        redis.set(key.toString(), value.toString())
+        getResource().use {
+            it.set(key, value)
+        }
     }
 
     fun getOrNull(key: String): String? {
-        return if (redis.exists(key)) {
-            redis.get(key.toString())
-        } else {
-            null
+        return getResource().use {
+            if (it.exists(key)) {
+                it.get(key)
+            } else {
+                null
+            }
         }
     }
+
+    private fun getResource() = jedisPool.resource
 }

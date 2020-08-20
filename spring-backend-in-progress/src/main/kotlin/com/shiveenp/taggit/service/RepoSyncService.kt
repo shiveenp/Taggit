@@ -17,9 +17,13 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 import javax.xml.bind.JAXBElement
 
 /**
@@ -39,12 +43,14 @@ class RepoSyncService(val githubService: GithubService,
         logger.info { "Syncing repos for user: $userId" }
         val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
         return if (token != null) {
-            val allRepos = getUserStarredRepos(token)
-            allRepos.forEach {
-                // FixMe: Add deduplicater in case repos have already been syncd
-                taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
+            GlobalScope.launch {
+                val allRepos = getUserStarredRepos(token)
+                allRepos.forEach {
+                    // FixMe: Add deduplicater in case repos have already been syncd
+                    taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
+                }
             }
-            allRepos.asFlow()
+            emptyList<GithubStargazingResponse>().asFlow()
         } else {
             throw GithubAuthException("Unable to sync repos for $userId")
         }

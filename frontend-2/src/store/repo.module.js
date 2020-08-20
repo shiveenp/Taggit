@@ -52,8 +52,13 @@ const mutations = {
 const actions = {
   resyncRepos({commit}, params) {
     commit("changeIsSyncing", true)
-    axios.post(TAGGIT_BASE_API_URL + "/user/" + params.userId + "/repos/sync").then(response => {
+    axios.get(TAGGIT_BASE_API_URL + "/user/" + params.userId + "/repos/sync", {
+      headers: {
+        "x-taggit-session-key": localStorage.getItem("taggit-session-token")
+      }
+    }).then(response => {
       console.log("Finished syncing repos")
+      console.log(`response data is ${response.data}`)
     }).catch(function (error) {
       console.log(error);
       commit("changeIsSyncing", false);
