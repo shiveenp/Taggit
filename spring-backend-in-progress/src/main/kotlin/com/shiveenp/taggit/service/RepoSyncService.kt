@@ -39,18 +39,18 @@ class RepoSyncService(val githubService: GithubService,
 
     private val logger = KotlinLogging.logger { }
 
-    suspend fun syncUserStargazingData(userId: UUID): Flow<GithubStargazingResponse> {
+    suspend fun syncUserStargazingData(userId: UUID): Flow<List<GithubStargazingResponse>> {
         logger.info { "Syncing repos for user: $userId" }
         val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
         return if (token != null) {
-            GlobalScope.launch {
-                val allRepos = getUserStarredRepos(token)
-                allRepos.forEach {
-                    // FixMe: Add deduplicater in case repos have already been syncd
-                    taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
+            Mono.fromCallable { getUserStarredRepos(token) }
+                .doOnNext {
+                    it.forEach {
+                        taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
+                    }
                 }
-            }
-            emptyList<GithubStargazingResponse>().asFlow()
+                .subscribeOn(Schedulers.boundedElastic())
+                .asFlow()
         } else {
             throw GithubAuthException("Unable to sync repos for $userId")
         }

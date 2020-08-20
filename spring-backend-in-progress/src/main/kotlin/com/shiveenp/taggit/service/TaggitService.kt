@@ -77,7 +77,7 @@ class TaggitService(private val githubService: GithubService,
         return repoRepository.findAllByUserId(userId, pageRequest).map { it.toDto() }.asFlow()
     }
 
-    suspend fun syncUserRepos(userId: UUID): Flow<GithubStargazingResponse> = repoSyncService.syncUserStargazingData(userId)
+    suspend fun syncUserRepos(userId: UUID): Flow<List<GithubStargazingResponse>> = repoSyncService.syncUserStargazingData(userId)
 
     suspend fun getDistinctTags(userId: UUID): Flow<String> {
         return repoRepository.findAllByUserId(userId)

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 
 @Service
 class GithubService(private val githubClient: WebClient) {
@@ -31,6 +32,7 @@ class GithubService(private val githubClient: WebClient) {
             .header("Authorization", "token $authToken")
             .retrieve()
             .toEntityList(GithubStargazingResponse::class.java)
+            .publishOn(Schedulers.boundedElastic())
             .block()
     }
 
