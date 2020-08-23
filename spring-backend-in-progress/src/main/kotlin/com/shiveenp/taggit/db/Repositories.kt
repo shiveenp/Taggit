@@ -2,6 +2,7 @@ package com.shiveenp.taggit.db
 
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitUserEntity
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -18,7 +19,7 @@ interface TaggitUserRepository : CrudRepository<TaggitUserEntity, UUID> {
 @Repository
 interface TaggitRepoRepository : PagingAndSortingRepository<TaggitRepoEntity, UUID> {
     fun findAllByUserId(userId: UUID): List<TaggitRepoEntity>
-    fun findAllByUserId(userId: UUID, pageable: Pageable): List<TaggitRepoEntity>
+    fun findAllByUserId(userId: UUID, pageable: Pageable): Page<TaggitRepoEntity>
 
     @Query(
         value = "SELECT * FROM repo r WHERE r.user_id = :userId and :tagJsonbQuery order by r.repo_name asc",

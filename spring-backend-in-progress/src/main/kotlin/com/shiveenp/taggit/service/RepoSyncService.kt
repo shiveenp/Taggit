@@ -4,27 +4,15 @@ import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
 import com.shiveenp.taggit.util.GithubAuthException
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
-import reactor.kotlin.core.publisher.toMono
 import java.util.*
-import java.util.stream.Collectors
-import java.util.stream.IntStream
-import javax.xml.bind.JAXBElement
 
 /**
  * This is the main service responsible for all the nitty gritty of repo sync logic that
@@ -43,7 +31,7 @@ class RepoSyncService(val githubService: GithubService,
         logger.info { "Syncing repos for user: $userId" }
         val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
         return if (token != null) {
-            Mono.fromCallable { getUserStarredRepos(token) }
+            Mono.fromCallable { getUserStarredReposToSync(token) }
                 .doOnNext {
                     it.forEach {
                         taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
@@ -56,7 +44,7 @@ class RepoSyncService(val githubService: GithubService,
         }
     }
 
-    fun getUserStarredRepos(token: String): List<GithubStargazingResponse> {
+    fun getUserStarredReposToSync(token: String): List<GithubStargazingResponse> {
         val startPage = 1
         val userStarredReposList = mutableListOf<GithubStargazingResponse>()
         var stargazingResponse = githubService.getStargazingDataOrNull(token, startPage)

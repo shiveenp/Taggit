@@ -1,6 +1,6 @@
 import axios from "axios";
 import qs from "qs";
-import {TAGGIT_BASE_API_URL, TAGGIT_BASE_WS_URI} from "../common/config";
+import {TAGGIT_BASE_API_URL} from "../common/config";
 
 const state = {
   isSyncing: false,
@@ -57,8 +57,8 @@ const actions = {
         "x-taggit-session-key": localStorage.getItem("taggit-session-token")
       }
     }).then(response => {
-      console.log("Finished syncing repos")
-      console.log(`response data is ${response.data}`)
+      params.vmInstance.$buefy.toast.open('Repo sync completed, please refresh page 🚀');
+      commit("changeIsSyncing", false);
     }).catch(function (error) {
       console.log(error);
       commit("changeIsSyncing", false);
@@ -69,7 +69,8 @@ const actions = {
     commit('fetchingData');
     axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos' + '?pageNm=' + state.pageNm + '&pageSize=' + state.pageSize, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "x-taggit-session-key": localStorage.getItem("taggit-session-token")
       }
     })
         .then(({data}) => {
@@ -91,7 +92,8 @@ const actions = {
         return qs.stringify(params, {arrayFormat: 'repeat'})
       },
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "x-taggit-session-key": localStorage.getItem("taggit-session-token")
       }
     }).then(({data}) => {
       commit('getActiveTagRepoData', data);
@@ -100,6 +102,18 @@ const actions = {
         .catch(error => {
           commit('fetchFinished');
           throw new Error(error);
+        });
+  },
+  addTagToRepo({commit}, params) {
+    axios.post(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos/' + params.repoId + '/tag',
+        {
+          tag: params.tag
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            "x-taggit-session-key": localStorage.getItem("taggit-session-token")
+          }
         });
   },
   changePageNm({commit}, data) {

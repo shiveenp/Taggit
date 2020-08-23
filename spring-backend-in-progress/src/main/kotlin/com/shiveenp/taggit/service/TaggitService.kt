@@ -50,8 +50,8 @@ class TaggitService(private val githubService: GithubService,
             val authToken = it.authentication as OAuth2AuthenticationToken
             clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name)
                 .doOnSuccess {
-                token = it.accessToken.tokenValue
-            }.subscribe()
+                    token = it.accessToken.tokenValue
+                }.subscribe()
             token.toMono()
         }.asFlow()
             .first()
@@ -71,10 +71,18 @@ class TaggitService(private val githubService: GithubService,
         }
     }
 
-    suspend fun getUserStarredRepos(userId: UUID, page: Int?, size: Int?): Flow<TaggitRepo> {
-        val pageRequest = PageRequest.of(page ?: DEFAULT_REPO_RESULT_PAGE_NUMBER,
-            size ?: DEFAULT_REPO_RESULT_PAGE_SIZE)
-        return repoRepository.findAllByUserId(userId, pageRequest).map { it.toDto() }.asFlow()
+    suspend fun getUserStarredRepos(userId: UUID, page: Int?, size: Int?): PagedResponse<TaggitRepo> {
+        val pageNumber = page ?: DEFAULT_REPO_RESULT_PAGE_NUMBER
+        val pageSize = size ?: DEFAULT_REPO_RESULT_PAGE_SIZE
+        val pageRequest = PageRequest.of(pageNumber, pageSize)
+        val dbReturnedPage = repoRepository.findAllByUserId(userId, pageRequest)
+        val reposToReturn = dbReturnedPage.toList().map { it.toDto() }
+        return PagedResponse(
+            data = reposToReturn,
+            pageNum = pageNumber,
+            pageSize = pageSize,
+            total = dbReturnedPage.totalElements
+        )
     }
 
     suspend fun syncUserRepos(userId: UUID): Flow<List<GithubStargazingResponse>> = repoSyncService.syncUserStargazingData(userId)

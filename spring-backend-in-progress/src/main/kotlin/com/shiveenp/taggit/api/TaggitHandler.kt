@@ -20,8 +20,7 @@ class TaggitHandler(
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
         val userAndToken = service.loginOrRegister()
         val token = tokenHandlerService.saveUserIdAndGetSessionToken(userAndToken.first.id, userAndToken.second)
-        return ok().bodyValueAndAwait(token)
-//        return temporaryRedirect("${externalProperties.uiUrl}/user/${userAndToken.first.id}/token?token=$token".toUri()).buildAndAwait()
+        return temporaryRedirect("${externalProperties.uiUrl}/user/${userAndToken.first.id}/token?token=$token".toUri()).buildAndAwait()
     }
 
     suspend fun getUser(req: ServerRequest): ServerResponse {
@@ -37,7 +36,7 @@ class TaggitHandler(
         val userId = getUserIdFromRequest(req)
         val page = req.queryParamOrNull("page")
         val size = req.queryParamOrNull("size")
-        return ok().bodyAndAwait(service.getUserStarredRepos(userId, page?.toIntOrNull(), size?.toIntOrNull()))
+        return ok().bodyValueAndAwait(service.getUserStarredRepos(userId, page?.toIntOrNull(), size?.toIntOrNull()))
     }
 
     suspend fun syncRepos(req: ServerRequest): ServerResponse {

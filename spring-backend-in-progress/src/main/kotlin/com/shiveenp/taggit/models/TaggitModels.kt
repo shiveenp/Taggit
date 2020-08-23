@@ -83,5 +83,5 @@ data class PagedResponse<T>(
     val data: List<T>,
     val pageNum: Int,
     val pageSize: Int,
-    val total: Int
+    val total: Long
 )

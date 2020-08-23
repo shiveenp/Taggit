@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { TAGGIT_BASE_API_URL } from "../common/config";
+  import { TAGGIT_BASE_API_URL } from "@/common/config";
 
   export default {
     methods: {
