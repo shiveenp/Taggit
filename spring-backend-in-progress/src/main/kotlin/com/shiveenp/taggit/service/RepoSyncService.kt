@@ -4,6 +4,7 @@ import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
 import com.shiveenp.taggit.util.GithubAuthException
+import com.shiveenp.taggit.util.notContains
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClient
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
+import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 /**
@@ -21,7 +23,6 @@ import java.util.*
 @Suppress("ReactiveStreamsUnusedPublisher")
 @Service
 class RepoSyncService(val githubService: GithubService,
-                      val clientService: ReactiveOAuth2AuthorizedClientService,
                       val taggitRepoRepository: TaggitRepoRepository,
                       val tokenHandlerService: TokenHandlerService) {
 
@@ -32,11 +33,17 @@ class RepoSyncService(val githubService: GithubService,
         val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
         return if (token != null) {
             Mono.fromCallable { getUserStarredReposToSync(token) }
-                .doOnNext {
-                    it.forEach {
+                .zipWith(taggitRepoRepository.findAll().toMono())
+                .doOnSuccess { zippedTuple ->
+                    val allStarredRepos = zippedTuple.t1
+                    val currentSyncedRepoIds = zippedTuple.t2.map { it.repoId }
+                    allStarredRepos.filter {
+                        currentSyncedRepoIds.notContains(it.id)
+                    }.forEach {
                         taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
                     }
                 }
+                .map { it.t1 }
                 .subscribeOn(Schedulers.boundedElastic())
                 .asFlow()
         } else {
@@ -76,3 +83,4 @@ class RepoSyncService(val githubService: GithubService,
         }
     }
 }
+
