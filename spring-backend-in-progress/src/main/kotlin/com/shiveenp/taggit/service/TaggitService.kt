@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
@@ -74,7 +75,7 @@ class TaggitService(private val githubService: GithubService,
     suspend fun getUserStarredRepos(userId: UUID, page: Int?, size: Int?): PagedResponse<TaggitRepo> {
         val pageNumber = page ?: DEFAULT_REPO_RESULT_PAGE_NUMBER
         val pageSize = size ?: DEFAULT_REPO_RESULT_PAGE_SIZE
-        val pageRequest = PageRequest.of(pageNumber, pageSize)
+        val pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by("repoName").ascending()) // default sort is repos in ascending order
         val dbReturnedPage = repoRepository.findAllByUserId(userId, pageRequest)
         val reposToReturn = dbReturnedPage.toList().map { it.toDto() }
         return PagedResponse(

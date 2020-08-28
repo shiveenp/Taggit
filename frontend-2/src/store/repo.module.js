@@ -7,7 +7,7 @@ const state = {
   repos: [],
   reposToDisplay: [],
   pageNm: '1',
-  pageSize: '51',
+  pageSize: '50',
   total: ''
 };
 
@@ -67,7 +67,7 @@ const actions = {
   ,
   fetchRepos({commit}, params) {
     commit('fetchingData');
-    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos' + '?pageNm=' + state.pageNm + '&pageSize=' + state.pageSize, {
+    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos' + '?pageNm=' + (state.pageNm - 1) + '&pageSize=' + state.pageSize, {
       headers: {
         'Content-Type': 'application/json',
         "x-taggit-session-key": localStorage.getItem("taggit-session-token")

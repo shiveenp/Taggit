@@ -22,6 +22,7 @@ spring:
 
 external:
   uiUrl: http://localhost:8081
+  turnOffSessionTokenCheck: true
 
 logging:
   level:

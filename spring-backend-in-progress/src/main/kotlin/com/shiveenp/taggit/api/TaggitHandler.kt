@@ -34,8 +34,8 @@ class TaggitHandler(
 
     suspend fun getRepos(req: ServerRequest): ServerResponse {
         val userId = getUserIdFromRequest(req)
-        val page = req.queryParamOrNull("page")
-        val size = req.queryParamOrNull("size")
+        val page = req.queryParamOrNull("pageNm")
+        val size = req.queryParamOrNull("pageSize")
         return ok().bodyValueAndAwait(service.getUserStarredRepos(userId, page?.toIntOrNull(), size?.toIntOrNull()))
     }
 

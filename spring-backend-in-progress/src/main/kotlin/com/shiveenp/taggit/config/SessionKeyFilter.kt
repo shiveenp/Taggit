@@ -12,18 +12,21 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 
 @Component
-class SessionKeyFilter(val tokenHandlerService: TokenHandlerService) : HandlerFilterFunction<ServerResponse?, ServerResponse?> {
+class SessionKeyFilter(val externalProperties: ExternalProperties,
+                       val tokenHandlerService: TokenHandlerService) : HandlerFilterFunction<ServerResponse?, ServerResponse?> {
     private val logger = KotlinLogging.logger { }
     override fun filter(request: ServerRequest,
                         handlerFunction: HandlerFunction<ServerResponse?>): Mono<ServerResponse?> {
-        return if (!request.path().contains("/signin")) {
+        val turnOffSessionTokenCheckFlag = externalProperties.turnOffSessionTokenCheck?.toBoolean() ?: false
+        val shouldCheckSessionToken = !request.path().contains("/signin") && !turnOffSessionTokenCheckFlag
+        return if (shouldCheckSessionToken) {
             val userId = request.pathVariable("userId")
             val sessionTokenInHeader = request.headers().firstHeader(SESSION_KEY_HEADER)
             val sessionTokenInMemory = tokenHandlerService.getSessionTokenFromUserIdOrNull(userId.toUUID())
             if (doSessionTokenMatch(sessionTokenInHeader, sessionTokenInMemory)) {
                 handlerFunction.handle(request)
             } else {
-                logger.debug { "Request denied since tokens don't match"}
+                logger.debug { "Request denied since tokens don't match" }
                 ServerResponse.status(HttpStatus.FORBIDDEN).build()
             }
         } else {
