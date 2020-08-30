@@ -1,15 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '../views/Login'
-import User from "../views/User";
+import Home from "../views/Home";
+import Account from "../views/Account";
+import TokenCapture from "@/views/TokenCapture";
 
 Vue.use(Router);
 
 export default new Router({
   mode: 'history',
   routes: [
-    {path: '/', component: Login},
-    {path: '/user/:userId', component: User},
+    {path: '/', name: 'login', component: Login},
+    {path: "/user/:userId/token", name: 'tokenCapture', component: TokenCapture},
+    {path: '/user/:userId', name: 'home', component: Home},
+    {path: '/user/:userId/account', name: 'account', component: Account},
 
     // otherwise redirect to home
     {path: '*', redirect: '/'}

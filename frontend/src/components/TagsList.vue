@@ -1,40 +1,28 @@
 <template>
-    <div class="container is-fluid">
-        <div class="buttons">
-            <TagButton v-for="tag in tags" v-bind:key="tag" v-bind:tag="tag"></TagButton>
-        </div>
+    <div class="buttons">
+        <TagButton v-for="tag in allTags" v-bind:key="tag" v-bind:tag="tag"></TagButton>
     </div>
 </template>
 
 <script>
   import TagButton from "./TagButton";
   import axios from "axios";
-  import { TAGGIT_BASE_API_URL } from "../common/config";
+  import {TAGGIT_BASE_API_URL} from "../common/config";
+  import {mapGetters} from "vuex";
 
   export default {
     name: "TagsList",
     components: {TagButton},
-    data() {
-      return {
-        tags: []
-      }
+    computed: {
+      ...mapGetters(["allTags"])
     },
     methods: {
       fetchAllTags() {
-        axios.get(TAGGIT_BASE_API_URL + '/user/' + this.$route.params.userId + '/tags', {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(({data}) => {
-          this.tags = data;
-        })
-            .catch(error => {
-              throw new Error(error);
-            });
+        this.$store.dispatch('fetchAllTags', {userId: this.$route.params.userId});
       },
     },
     mounted() {
-      this.fetchAllTags()
+      this.fetchAllTags();
     }
   }
 </script>
