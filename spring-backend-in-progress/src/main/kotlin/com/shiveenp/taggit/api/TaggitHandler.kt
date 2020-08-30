@@ -46,7 +46,7 @@ class TaggitHandler(
 
     suspend fun getRepoTags(req: ServerRequest): ServerResponse {
         val userId = getUserIdFromRequest(req)
-        return ok().bodyAndAwait(service.getDistinctTags(userId))
+        return ok().bodyValueAndAwait(service.getDistinctTags(userId))
     }
 
     suspend fun addTagToRepo(req: ServerRequest): ServerResponse {
@@ -69,8 +69,8 @@ class TaggitHandler(
 
     suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
         val loggedInUser = getUserIdFromRequest(req)
-        val tags = req.queryParams().get("tag") ?: emptyList()
-        return ok().bodyAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
+        val tags = req.queryParams()["tag"] ?: emptyList()
+        return ok().bodyValueAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
     }
 
     private suspend fun getUserIdFromRequest(req: ServerRequest) = req.pathVariable(USER_ID_PATH_VARIABLE).toUUID()

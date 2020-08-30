@@ -1,16 +1,21 @@
 package com.shiveenp.taggit.service
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.db.TaggitUserEntity
 import com.shiveenp.taggit.models.*
+import com.shiveenp.taggit.util.toUUID
+import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.awaitSingle
+import org.hibernate.type.IntegerType
+import org.hibernate.type.LongType
+import org.hibernate.type.StringType
+import org.hibernate.type.UUIDBinaryType
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -21,13 +26,16 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Service
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
+import javax.persistence.EntityManagerFactory
 
 @Service
 class TaggitService(private val githubService: GithubService,
                     private val repoSyncService: RepoSyncService,
                     private val userRepository: TaggitUserRepository,
                     private val repoRepository: TaggitRepoRepository,
-                    private val clientService: ReactiveOAuth2AuthorizedClientService) {
+                    private val clientService: ReactiveOAuth2AuthorizedClientService,
+                    private val entityManagerFactory: EntityManagerFactory,
+                    private val mapper: ObjectMapper) {
 
     suspend fun loginOrRegister(): Pair<TaggitUser, String> {
         val githubUser = githubService.getUserData()
@@ -88,14 +96,14 @@ class TaggitService(private val githubService: GithubService,
 
     suspend fun syncUserRepos(userId: UUID): Flow<List<GithubStargazingResponse>> = repoSyncService.syncUserStargazingData(userId)
 
-    suspend fun getDistinctTags(userId: UUID): Flow<String> {
+    suspend fun getDistinctTags(userId: UUID): Set<String> {
         return repoRepository.findAllByUserId(userId)
             .mapNotNull {
                 it.metadata
             }
             .flatMap {
                 it.tags
-            }.toSortedSet().asFlow()
+            }.toSortedSet()
     }
 
     suspend fun addRepoTag(repoId: UUID, tagInput: TagInput): TaggitRepoEntity? {
@@ -117,30 +125,57 @@ class TaggitService(private val githubService: GithubService,
         }
     }
 
-    fun deleteTagFromRepo(repoId: UUID, tag: String) {
-        repoRepository.findByIdOrNull(repoId)?.let {
+    fun deleteTagFromRepo(repoId: UUID, tag: String): List<TaggitRepoEntity> {
+        val updatedRepoWithTagDeleted = repoRepository.findByIdOrNull(repoId)?.let {
             val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tag)
             repoRepository.save(it.withUpdated(metadata = updatedMetadata))
         }
+        return if(updatedRepoWithTagDeleted != null) {
+            listOf(updatedRepoWithTagDeleted)
+        } else {
+            emptyList()
+        }
     }
 
-    private fun deleteTagFromMetadataOrNull(metadata: Metadata?, tag: String): Metadata? {
+    private fun deleteTagFromMetadataOrNull(metadata: Metadata?, tagToRemove: String): Metadata? {
         return metadata?.let {
-            val updatedTags = it.tags.apply {
-                this.toMutableList().run {
-                    this.remove(tag)
-                }
-            }
+            val updatedTags = it.tags.filter { it != tagToRemove }
             Metadata(tags = updatedTags)
         }
     }
 
-    suspend fun searchUserReposByTags(userId: UUID, tags: List<String>): Flow<TaggitRepoEntity> {
+    suspend fun searchUserReposByTags(userId: UUID, tags: List<String>): List<Any> {
         val tagsJsonBQuery = tags.map {
             "r.metadata @> '{\"tags\":[\"$it\"]}'"
         }.joinToString(" OR ")
-        return repoRepository.findAllByMetadataTags(userId, tagsJsonBQuery).asFlow()
+        val sqlToExecute = "SELECT * FROM repo r WHERE r.user_id = '$userId' and ${tagsJsonBQuery} order by r.repo_name asc"
+        entityManagerFactory.createEntityManager()
+        return entityManagerFactory.createEntityManager()
+            .createNativeQuery(sqlToExecute)
+            .unwrap(org.hibernate.query.NativeQuery::class.java)
+            .addScalar("id", StringType.INSTANCE)
+            .addScalar("user_id", StringType.INSTANCE)
+            .addScalar("repo_id", LongType.INSTANCE)
+            .addScalar("repo_name", StringType.INSTANCE)
+            .addScalar("github_link", StringType.INSTANCE)
+            .addScalar("github_description", StringType.INSTANCE)
+            .addScalar("star_count", IntegerType.INSTANCE)
+            .addScalar("owner_avatar_url", StringType.INSTANCE)
+            .addScalar("metadata", JsonNodeBinaryType.INSTANCE)
+            .resultList.map {
+                val node = mapper.valueToTree<JsonNode>(it)
 
+                TaggitRepo(
+                    id = node[0].asText().toUUID(),
+                    userId = node[1].asText().toUUID(),
+                    repoId = node[2].asLong(),
+                    repoName = node[3].asText(),
+                    githubLink = node[4].asText(),
+                    githubDescription = node[5].asText(),
+                    ownerAvatarUrl = node[7].asText(),
+                    metadata = mapper.convertValue(node[8], Metadata::class.java)
+                )
+            }
     }
 
 

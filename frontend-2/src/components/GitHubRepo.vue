@@ -58,7 +58,7 @@ export default {
       this.$store.dispatch('addTag', tag);
     },
     removeTag(tag) {
-      axios.delete(TAGGIT_BASE_API_URL + '/repo/' + this.id + '/tag/' + tag,
+      axios.delete(TAGGIT_BASE_API_URL + '/user/' + this.$route.params.userId + '/repos/' + this.id + '/tag/' + tag,
           {
             'Content-Type': 'application/json'
           });
