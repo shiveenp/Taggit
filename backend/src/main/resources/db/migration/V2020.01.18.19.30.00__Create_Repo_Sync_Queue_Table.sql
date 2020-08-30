@@ -3,6 +3,9 @@ create table repo_sync_jobs
     id        uuid PRIMARY KEY,
     user_id   uuid not null,
     completed boolean default false,
+    error text,
+    progress_percent real default 0.0,
+    status text,
     created_at timestamptz default now()
 );
 
