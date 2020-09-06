@@ -62,7 +62,7 @@ class TaggitHandler(
 
     suspend fun deleteTagFromRepo(req: ServerRequest): ServerResponse {
         val repoId = req.pathVariable("repoId").toUUID()
-        val tagToRemove = req.pathVariable("tag")
+        val tagToRemove = req.queryParamOrNull("tag")
         val updatedRepo = service.deleteTagFromRepo(repoId, tagToRemove)
         return ok().bodyValueAndAwait(updatedRepo)
     }
