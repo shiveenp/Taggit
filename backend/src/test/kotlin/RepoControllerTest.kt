@@ -12,6 +12,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 //https://dev.to/rieckpil/write-spring-boot-integration-tests-with-testcontainers-junit-4-5-40am
 //https://dev.to/sivalabs/springboot-integration-testing-using-testcontainers-starter-13h2
+// https://www.baeldung.com/spring-boot-testcontainers-integration-test
+// https://dzone.com/articles/testcontainers-and-spring-boot
 
 @Testcontainers
 @EnableAutoConfiguration
