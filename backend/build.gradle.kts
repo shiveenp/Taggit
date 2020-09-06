@@ -36,6 +36,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:6.1.3")
     implementation("io.github.microutils:kotlin-logging:1.7.7")
     implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+    implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
 
     // kotlin
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -49,6 +50,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("io.mockk:mockk:1.9.3")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.23")
     testImplementation("io.projectreactor:reactor-test")
 }
 
