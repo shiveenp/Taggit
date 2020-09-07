@@ -14,6 +14,7 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -56,6 +57,8 @@ dependencies {
     testImplementation("io.mockk:mockk:1.9.3")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.23")
     testImplementation("io.projectreactor:reactor-test")
+    testImplementation("io.github.serpro69:kotlin-faker:1.5.0")
+    testImplementation("org.apache.commons:commons-math3:3.6.1")
 }
 
 tasks.withType<Test> {
