@@ -1,16 +1,15 @@
 import com.shiveenp.taggit.TaggitApplication
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
-import com.shiveenp.taggit.util.toJson
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
@@ -21,10 +20,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 // https://www.baeldung.com/spring-boot-testcontainers-integration-test
 // https://dzone.com/articles/testcontainers-and-spring-boot
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringJUnitConfig
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) //https://stackoverflow.com/a/48821395
 @Testcontainers
-@EnableAutoConfiguration
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [RepoTagControllerTest.Companion.Initializer::class, TaggitApplication::class])
 class RepoTagControllerTest {
