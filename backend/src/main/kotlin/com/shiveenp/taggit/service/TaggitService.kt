@@ -37,7 +37,7 @@ class TaggitService(private val githubService: GithubService,
                     private val entityManagerFactory: EntityManagerFactory,
                     private val mapper: ObjectMapper) {
 
-    private val logger = KotlinLogging.logger{ }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun loginOrRegister(): Pair<TaggitUser, String> {
         val githubUser = githubService.getUserData()
@@ -127,21 +127,12 @@ class TaggitService(private val githubService: GithubService,
         }
     }
 
-    fun deleteTagFromRepo(repoId: UUID, tagToDelete: String?): List<TaggitRepoEntity> {
-        return if (tagToDelete != null) {
-            val updatedRepoWithTagDeleted = repoRepository.findByIdOrNull(repoId)?.let {
-                val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tagToDelete)
-                repoRepository.save(it.withUpdated(metadata = updatedMetadata))
-            }
-            return if (updatedRepoWithTagDeleted != null) {
-                listOf(updatedRepoWithTagDeleted)
-            } else {
-                emptyList()
-            }
-        } else {
-            logger.warn { "The tag to delete provided was null" }
-            emptyList()
+    fun deleteTagFromRepo(repoId: UUID, tagToDelete: String): TaggitRepoEntity {
+        val updatedRepoWithTagDeleted = repoRepository.findByIdOrNull(repoId)?.let {
+            val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tagToDelete)
+            repoRepository.save(it.withUpdated(metadata = updatedMetadata))
         }
+        return updatedRepoWithTagDeleted!!
     }
 
     private fun deleteTagFromMetadataOrNull(metadata: Metadata?, tagToRemove: String): Metadata? {

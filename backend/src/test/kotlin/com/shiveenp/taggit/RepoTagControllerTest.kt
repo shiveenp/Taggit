@@ -2,6 +2,7 @@ package com.shiveenp.taggit
 
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
+import com.shiveenp.taggit.models.Metadata
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeAll
@@ -60,7 +61,7 @@ class RepoTagControllerTest {
     }
 
     @Test
-    fun `we can save single repos tags correctly`() {
+    fun `we can save single tags correctly`() {
         val testRepo = generateMockRepoEntity(testUser.id)
         taggitRepoRepository.save(testRepo)
         val tagInputToSave = generateRandomTagInput()
@@ -115,6 +116,79 @@ class RepoTagControllerTest {
             .value(Matchers.hasSize<String>(2))
     }
 
+    @Test
+    fun `we can delete single tags correctly`() {
+        val tagToDelete = "hello,fake-tag"
+        val testRepo = generateMockRepoEntity(testUser.id, Metadata(listOf(tagToDelete)))
+        taggitRepoRepository.save(testRepo)
+
+        // technically you wanna check that the tag was saved properly before checking again,
+        // but in this case we're trusting the repository impl and would hopefully test that in
+        // a separate test
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isEmpty
+    }
+
+    @Test
+    fun `we can delete multiple tags correctly`() {
+        // let's start off by saving three tags wne we will delete them one by one
+        val tagToDelete1 = "hello,fake-tag 1"
+        val tagToDelete2 = "hello, fake-tag 2"
+        val tagToDelete3 = "hello, fake tag 3"
+        val testRepo = generateMockRepoEntity(testUser.id,
+            Metadata(listOf(tagToDelete1, tagToDelete2, tagToDelete3)))
+        taggitRepoRepository.save(testRepo)
+
+        // 1 deleted, 2 remaining
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete1")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isArray
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagToDelete2))
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagToDelete3))
+            .jsonPath("$.metadata.tags")
+            .value(Matchers.hasSize<String>(2))
+
+        // 2 deleted, 1 remaining
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete2")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isArray
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagToDelete3))
+            .jsonPath("$.metadata.tags")
+            .value(Matchers.hasSize<String>(1))
+
+        // all deleted
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete3")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isEmpty
+    }
+
+    // Todo: Add test for deleting tags with `/`
+    // Todo: Add tests for user input validation here, such as what happens when user sends a null tag,
+    // take exampled from the mixit repo
 
     @BeforeAll
     internal fun setUp() {

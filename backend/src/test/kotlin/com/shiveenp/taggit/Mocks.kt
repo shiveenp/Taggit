@@ -2,9 +2,11 @@ package com.shiveenp.taggit
 
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitUserEntity
+import com.shiveenp.taggit.models.Metadata
 import com.shiveenp.taggit.models.TagInput
 import io.github.serpro69.kfaker.Faker
 import org.apache.commons.math3.random.RandomDataGenerator
+import org.junit.jupiter.api.Tags
 import java.time.LocalDateTime
 import java.util.*
 
@@ -23,7 +25,8 @@ fun generateMockUserEntity() =
         updatedAt = LocalDateTime.now()
     )
 
-fun generateMockRepoEntity(userId: UUID? = null) =
+fun generateMockRepoEntity(userId: UUID? = null,
+                           metadata: Metadata? = null) =
     TaggitRepoEntity(
         id = UUID.randomUUID(),
         userId = userId ?: UUID.randomUUID(),
@@ -33,8 +36,8 @@ fun generateMockRepoEntity(userId: UUID? = null) =
         githubDescription = null,
         starCount = randomNumberGenerator.nextInt(Int.MIN_VALUE, Int.MAX_VALUE),
         ownerAvatarUrl = "http://google.com",
-        metadata = null
+        metadata = metadata
     )
 
-fun generateRandomTagInput() = TagInput(faker.book.title())
+fun generateRandomTagInput(tag: String? = null) = TagInput(tag ?: faker.book.title())
 
