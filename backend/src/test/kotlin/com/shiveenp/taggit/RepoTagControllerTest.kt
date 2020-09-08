@@ -1,6 +1,9 @@
-import com.shiveenp.taggit.TaggitApplication
+package com.shiveenp.taggit
+
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
+import org.hamcrest.Matchers
+import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -29,7 +32,6 @@ class RepoTagControllerTest {
     @Autowired
     private lateinit var webTestClient: WebTestClient
     private val testUser = generateMockUserEntity()
-    private val testRepo = generateMockRepoEntity(testUser.id)
 
     @Autowired
     private lateinit var taggitUserRepository: TaggitUserRepository
@@ -58,7 +60,9 @@ class RepoTagControllerTest {
     }
 
     @Test
-    fun `test we can save repos tags correctly`() {
+    fun `we can save single repos tags correctly`() {
+        val testRepo = generateMockRepoEntity(testUser.id)
+        taggitRepoRepository.save(testRepo)
         val tagInputToSave = generateRandomTagInput()
         webTestClient.post()
             .uri("/user/${testUser.id}/repos/${testRepo.id}/tag")
@@ -73,9 +77,47 @@ class RepoTagControllerTest {
             .isEqualTo(tagInputToSave.tag)
     }
 
+    @Test
+    fun `we can save multiple tags correctly`() {
+        val testRepo = generateMockRepoEntity(testUser.id)
+        taggitRepoRepository.save(testRepo)
+        val tagInputToSave1 = generateRandomTagInput()
+        val tagInputToSave2 = generateRandomTagInput()
+        // save first tag
+        webTestClient.post()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag")
+            .bodyValue(tagInputToSave1)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isNotEmpty
+            .jsonPath("$.metadata.tags")
+            .isEqualTo(tagInputToSave1.tag)
+        // save second tag
+        webTestClient.post()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag")
+            .bodyValue(tagInputToSave2)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isNotEmpty
+            .jsonPath("$.metadata.tags")
+            .isArray
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagInputToSave1.tag))
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagInputToSave2.tag))
+            .jsonPath("$.metadata.tags")
+            .value(Matchers.hasSize<String>(2))
+    }
+
+
     @BeforeAll
     internal fun setUp() {
         taggitUserRepository.save(testUser)
-        taggitRepoRepository.save(testRepo)
     }
 }

@@ -1,3 +1,5 @@
+package com.shiveenp.taggit
+
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitUserEntity
 import com.shiveenp.taggit.models.TagInput
