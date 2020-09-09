@@ -4,18 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
-import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.db.TaggitUserEntity
+import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.models.*
 import com.shiveenp.taggit.util.toUUID
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.reactive.asFlow
+import mu.KotlinLogging
 import org.hibernate.type.IntegerType
 import org.hibernate.type.LongType
 import org.hibernate.type.StringType
-import org.hibernate.type.UUIDBinaryType
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -36,6 +36,8 @@ class TaggitService(private val githubService: GithubService,
                     private val clientService: ReactiveOAuth2AuthorizedClientService,
                     private val entityManagerFactory: EntityManagerFactory,
                     private val mapper: ObjectMapper) {
+
+    private val logger = KotlinLogging.logger { }
 
     suspend fun loginOrRegister(): Pair<TaggitUser, String> {
         val githubUser = githubService.getUserData()
@@ -125,16 +127,12 @@ class TaggitService(private val githubService: GithubService,
         }
     }
 
-    fun deleteTagFromRepo(repoId: UUID, tag: String): List<TaggitRepoEntity> {
+    fun deleteTagFromRepo(repoId: UUID, tagToDelete: String): TaggitRepoEntity {
         val updatedRepoWithTagDeleted = repoRepository.findByIdOrNull(repoId)?.let {
-            val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tag)
+            val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tagToDelete)
             repoRepository.save(it.withUpdated(metadata = updatedMetadata))
         }
-        return if(updatedRepoWithTagDeleted != null) {
-            listOf(updatedRepoWithTagDeleted)
-        } else {
-            emptyList()
-        }
+        return updatedRepoWithTagDeleted!!
     }
 
     private fun deleteTagFromMetadataOrNull(metadata: Metadata?, tagToRemove: String): Metadata? {
