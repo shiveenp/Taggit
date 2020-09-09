@@ -14,16 +14,16 @@ class Router {
             GET("signin", taggitHandler::loginOrSignup)
         }
 
-        // Todo: delete api needs to be added yet
         "/user/{userId}".nest {
             GET("", taggitHandler::getUser)
             PUT("", taggitHandler::updateUser)
+            DELETE("", taggitHandler::deleteUser)
 
             "/repos".nest {
                 GET("", taggitHandler::getRepos)
                 GET("/sync", taggitHandler::syncRepos)
                 GET("/tags", taggitHandler::getRepoTags)
-                POST("/{repoId}/tag", taggitHandler::addTagToRepo)
+                POST("/{repoId}/ta  g", taggitHandler::addTagToRepo)
                 DELETE("/{repoId}/tag", taggitHandler::deleteTagFromRepo)
                 GET("/search", taggitHandler::searchRepoByTags)
             }
