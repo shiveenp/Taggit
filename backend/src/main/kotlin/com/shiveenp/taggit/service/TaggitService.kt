@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
 import javax.persistence.EntityManagerFactory
@@ -80,6 +81,12 @@ class TaggitService(private val githubService: GithubService,
         } else {
             throw Exception("User does not exist")
         }
+    }
+
+    @Transactional(readOnly = false)
+    suspend fun deleteUser(userId: UUID) {
+        repoRepository.deleteAllByUserId(userId)
+        userRepository.deleteById(userId)
     }
 
     suspend fun getUserStarredRepos(userId: UUID, page: Int?, size: Int?): PagedResponse<TaggitRepo> {

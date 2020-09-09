@@ -32,6 +32,12 @@ class TaggitHandler(
         return ok().bodyValueAndAwait(service.updateUser(getUserIdFromRequest(req), req.awaitBody()))
     }
 
+    suspend fun deleteUser(req: ServerRequest): ServerResponse {
+        val userId = getUserIdFromRequest(req)
+        service.deleteUser(userId)
+        return accepted().bodyValueAndAwait("Accepted")
+    }
+
     suspend fun getRepos(req: ServerRequest): ServerResponse {
         val userId = getUserIdFromRequest(req)
         val page = req.queryParamOrNull("pageNm")
