@@ -186,9 +186,55 @@ class RepoTagControllerTest {
             .isEmpty
     }
 
-    // Todo: Add test for deleting tags with `/`
-    // Todo: Add tests for user input validation here, such as what happens when user sends a null tag,
-    // take exampled from the mixit repo
+    @Test
+    fun `we can delete tags with special characters correctly`() {
+        val tagToDelete1 = "/" // this tag could cause issues if not sent as a query param
+        val tagToDelete2 = "🤓🦆🚀🏕🥰"
+        val tagToDelete3 = "       "
+        val testRepo = generateMockRepoEntity(testUser.id,
+            Metadata(listOf(tagToDelete1, tagToDelete2, tagToDelete3)))
+        taggitRepoRepository.save(testRepo)
+
+        // 1 deleted, 3 remaining
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete1")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isArray
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagToDelete2))
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagToDelete3))
+            .jsonPath("$.metadata.tags")
+            .value(Matchers.hasSize<String>(2))
+
+        // 2 deleted, 2 remaining
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete2")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isArray
+            .jsonPath("$.metadata.tags")
+            .value(hasItem(tagToDelete3))
+            .jsonPath("$.metadata.tags")
+            .value(Matchers.hasSize<String>(1))
+
+        // 3 deleted, 1 remaining
+        webTestClient.delete()
+            .uri("/user/${testUser.id}/repos/${testRepo.id}/tag?tag=$tagToDelete3")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .expectBody()
+            .jsonPath("$.metadata.tags")
+            .isEmpty
+    }
 
     @BeforeAll
     internal fun setUp() {
