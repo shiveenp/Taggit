@@ -1,0 +1,36 @@
+version: '3'
+services:
+  backend:
+    container_name: 'backend'
+    image: 'backend:0.0.1-SNAPSHOT'
+    ports:
+      - '127.0.0.1:8080:8080'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - default
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/taggit
+  postgres:
+    container_name: 'postgres'
+    image: 'postgres:9.5.3'
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - 'pgdata:/var/lib/postgresql/data/'
+    networks:
+      - default
+  redis:
+    container_name: 'redis'
+    image: 'redis:3.2.0'
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - 'redisdata:/data'
+    networks:
+      - default
+
+volumes:
+  pgdata:
+  redisdata:
