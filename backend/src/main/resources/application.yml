@@ -1,7 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/taggit
-    username: postgres
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/taggit}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:}
   security:
     oauth2:
       client:
