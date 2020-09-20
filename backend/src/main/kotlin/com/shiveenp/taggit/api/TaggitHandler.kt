@@ -6,6 +6,7 @@ import com.shiveenp.taggit.service.TaggitService
 import com.shiveenp.taggit.service.TokenHandlerService
 import com.shiveenp.taggit.util.toUUID
 import com.shiveenp.taggit.util.toUri
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.*
@@ -13,9 +14,11 @@ import org.springframework.web.reactive.function.server.ServerResponse.*
 
 @Component
 class TaggitHandler(
-    private val service: TaggitService,
-    private val externalProperties: ExternalProperties,
-    private val tokenHandlerService: TokenHandlerService) {
+        private val service: TaggitService,
+        private val externalProperties: ExternalProperties,
+        private val tokenHandlerService: TokenHandlerService) {
+
+    private val logger = KotlinLogging.logger { }
 
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
         val userAndToken = service.loginOrRegister()
@@ -25,7 +28,13 @@ class TaggitHandler(
 
     suspend fun getUser(req: ServerRequest): ServerResponse {
         val userId = getUserIdFromRequest(req)
-        return ok().bodyValueAndAwait(service.getUser(userId)!!)
+        val user = service.getUser(userId)
+        return if (user != null) {
+            ok().bodyValueAndAwait(user)
+        } else {
+            logger.warn { "User with id: $userId not found" }
+            notFound().buildAndAwait()
+        }
     }
 
     suspend fun updateUser(req: ServerRequest): ServerResponse {
