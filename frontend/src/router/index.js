@@ -3,11 +3,11 @@ import Router from 'vue-router'
 import Login from '../views/Login'
 import Home from "../views/Home";
 import Account from "../views/Account";
-import TokenCapture from "@/views/TokenCapture";
+import TokenCapture from '@/views/TokenCapture';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {path: '/', name: 'login', component: Login},
@@ -18,17 +18,19 @@ export default new Router({
     // otherwise redirect to home
     {path: '*', redirect: '/'}
   ]
-});
+})
 
-// index.beforeEach((to, from, next) => {
-//   // redirect to login page if not logged in and trying to access a restricted page
-//   const cookie = document.cookie;
-//   const publicPages = ['/']
-//   const authRequired = !publicPages.includes(to.path);
-//
-//   if (authRequired && !loggedIn) {
-//     return next('/')
-//   }
-//
-//   next()
-// })
+
+router.beforeEach((to, from, next) => {
+  // redirect to login page if not logged in and trying to access a restricted page
+  const isAuthenticated = localStorage.getItem("taggit-session-token")
+  const authRequired = to.name !== 'login' && to.name !== 'tokenCapture';
+
+  if (authRequired && !isAuthenticated) {
+    next({name: 'login'});
+  } else {
+    next();
+  }
+})
+
+export default router;
