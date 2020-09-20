@@ -23,7 +23,7 @@ class Router {
                 GET("", taggitHandler::getRepos)
                 GET("/sync", taggitHandler::syncRepos)
                 GET("/tags", taggitHandler::getRepoTags)
-                POST("/{repoId}/ta  g", taggitHandler::addTagToRepo)
+                POST("/{repoId}/tag", taggitHandler::addTagToRepo)
                 DELETE("/{repoId}/tag", taggitHandler::deleteTagFromRepo)
                 GET("/search", taggitHandler::searchRepoByTags)
             }
