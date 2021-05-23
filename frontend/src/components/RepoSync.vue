@@ -1,4 +1,4 @@
-<template>
+ <template>
     <div>
         <b-button v-if="!isSyncing" type="submit" size="is-small" class="button is-primary" icon-left="sync"
                 @click="resyncRepos">Sync

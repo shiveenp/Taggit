@@ -21,7 +21,6 @@
           <b-taginput
               v-model="tags"
               ellipsis
-              icon="label"
               placeholder="Add a tag"
               size="is-small"
               type="is-dark"

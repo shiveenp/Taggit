@@ -16,6 +16,7 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 repositories {
     jcenter()
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -28,8 +29,11 @@ dependencies {
     implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    // see: https://github.com/jobrunr/jobrunr/issues/77 to remove this in the future
+    implementation("org.jobrunr:jobrunr:1.0.0-SNAPSHOT") // not needed as jobrunr-kotlin-support pulls this in as a transient dependency
+    implementation("org.jobrunr:jobrunr-spring-boot-starter:1.0.0-SNAPSHOT")
+    implementation("org.jobrunr:jobrunr-kotlin-support:2.0.1")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
-
     // utils
     implementation("redis.clients:jedis:3.2.0")
     implementation("com.vladmihalcea:hibernate-types-52:2.2.2")
@@ -37,6 +41,9 @@ dependencies {
     implementation("org.flywaydb:flyway-core:6.1.3")
     implementation("io.github.microutils:kotlin-logging:1.7.7")
     implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
 
     // kotlin

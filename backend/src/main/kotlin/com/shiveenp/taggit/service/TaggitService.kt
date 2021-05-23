@@ -16,6 +16,7 @@ import mu.KotlinLogging
 import org.hibernate.type.IntegerType
 import org.hibernate.type.LongType
 import org.hibernate.type.StringType
+import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
 import javax.persistence.EntityManagerFactory
+
 
 @Service
 class TaggitService(private val githubService: GithubService,
@@ -103,7 +105,10 @@ class TaggitService(private val githubService: GithubService,
         )
     }
 
-    suspend fun syncUserRepos(userId: UUID): Flow<List<GithubStargazingResponse>> = repoSyncService.syncUserStargazingData(userId)
+    suspend fun syncUserRepos(userId: UUID): String {
+        BackgroundJob.enqueue { repoSyncService.syncUserStargazingData(userId) }
+        return "Started sync job for userId: $userId"
+    }
 
     suspend fun getDistinctTags(userId: UUID): Set<String> {
         return repoRepository.findAllByUserId(userId)

@@ -9,5 +9,6 @@ import org.springframework.core.annotation.Order
 @ConfigurationProperties(prefix = "external")
 data class ExternalProperties(
     val uiUrl: String,
-    val turnOffSessionTokenCheck: String?
+    val turnOffSessionTokenCheck: String?,
+    val jwtSigningKey: String
 )

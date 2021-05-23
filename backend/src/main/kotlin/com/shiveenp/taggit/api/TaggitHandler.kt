@@ -22,7 +22,7 @@ class TaggitHandler(
 
     suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
         val userAndToken = service.loginOrRegister()
-        val token = tokenHandlerService.saveUserIdAndGetSessionToken(userAndToken.first.id, userAndToken.second)
+        val token = tokenHandlerService.saveUserIdAndGetJwt(userAndToken.first.id, userAndToken.second)
         return temporaryRedirect("${externalProperties.uiUrl}/user/${userAndToken.first.id}/token?token=$token".toUri()).buildAndAwait()
     }
 
@@ -56,7 +56,7 @@ class TaggitHandler(
 
     suspend fun syncRepos(req: ServerRequest): ServerResponse {
         val userId = getUserIdFromRequest(req)
-        return ok().bodyAndAwait(service.syncUserRepos(userId))
+        return ok().bodyValueAndAwait(service.syncUserRepos(userId))
     }
 
     suspend fun getRepoTags(req: ServerRequest): ServerResponse {
@@ -85,7 +85,7 @@ class TaggitHandler(
     suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
         val loggedInUser = getUserIdFromRequest(req)
         val tags = req.queryParams()["tag"] ?: emptyList()
-        return ok().bodyValueAndAwait(service.searchUserReposByTags(loggedInUser!!, tags))
+        return ok().bodyValueAndAwait(service.searchUserReposByTags(loggedInUser, tags))
     }
 
     private suspend fun getUserIdFromRequest(req: ServerRequest) = req.pathVariable(USER_ID_PATH_VARIABLE).toUUID()

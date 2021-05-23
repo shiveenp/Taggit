@@ -16,16 +16,25 @@ spring:
   flyway:
     enabled: true
   redis:
-    host: localhost
-    port: 6379
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
   session:
     store-type: redis
 
 external:
   uiUrl: http://localhost:8081
-  turnOffSessionTokenCheck: true
+  turnOffSessionTokenCheck: false
+  jwtSigningKey: G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=
 
 logging:
   level:
     root: info
     com.shiveenp.taggit: debug
+
+org:
+  jobrunr:
+    background-job-server:
+      enabled: true
+    dashboard:
+      enabled: true
+      port: 9090

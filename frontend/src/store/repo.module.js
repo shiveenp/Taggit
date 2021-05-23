@@ -57,7 +57,7 @@ const actions = {
         "x-taggit-session-key": localStorage.getItem("taggit-session-token")
       }
     }).then(response => {
-      params.vmInstance.$buefy.toast.open('Repo sync completed, please refresh page 🚀');
+      params.vmInstance.$buefy.toast.open('Repo sync initiated in the background');
       commit("changeIsSyncing", false);
     }).catch(function (error) {
       console.log(error);

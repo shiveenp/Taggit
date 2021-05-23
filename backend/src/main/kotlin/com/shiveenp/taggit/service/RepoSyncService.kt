@@ -22,30 +22,26 @@ import java.util.*
  */
 @Suppress("ReactiveStreamsUnusedPublisher")
 @Service
-class RepoSyncService(val githubService: GithubService,
-                      val taggitRepoRepository: TaggitRepoRepository,
-                      val tokenHandlerService: TokenHandlerService) {
+class RepoSyncService(
+    val githubService: GithubService,
+    val taggitRepoRepository: TaggitRepoRepository,
+    val tokenHandlerService: TokenHandlerService
+) {
 
     private val logger = KotlinLogging.logger { }
 
-    suspend fun syncUserStargazingData(userId: UUID): Flow<List<GithubStargazingResponse>> {
+    fun syncUserStargazingData(userId: UUID) {
         logger.info { "Syncing repos for user: $userId" }
         val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
-        return if (token != null) {
-            Mono.fromCallable { getUserStarredReposToSync(token) }
-                .zipWith(taggitRepoRepository.findAll().toMono())
-                .doOnSuccess { zippedTuple ->
-                    val allStarredRepos = zippedTuple.t1
-                    val currentSyncedRepoIds = zippedTuple.t2.map { it.repoId }
-                    allStarredRepos.filter {
-                        currentSyncedRepoIds.notContains(it.id)
-                    }.forEach {
-                        taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
-                    }
-                }
-                .map { it.t1 }
-                .subscribeOn(Schedulers.boundedElastic())
-                .asFlow()
+        if (token != null) {
+            val repos = getUserStarredReposToSync(token)
+            val existingRepos = taggitRepoRepository.findAll()
+            val currentSyncedRepoIds = existingRepos.map { it.repoId }
+            repos.filter {
+                currentSyncedRepoIds.notContains(it.id)
+            }.forEach {
+                taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
+            }
         } else {
             throw GithubAuthException("Unable to sync repos for $userId")
         }
