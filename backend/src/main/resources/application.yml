@@ -17,9 +17,9 @@ spring:
     enabled: true
 
 external:
-  uiUrl: http://localhost:8081
-  turnOffSessionTokenCheck: false
-  jwtSigningKey: G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=
+  uiUrl: ${UI_URL:http://localhost:8081}
+  turnOffSessionTokenCheck: ${TURN_OFF_SESSION_TOKEN_CHECK:false}
+  jwtSigningKey: ${JWT_SIGNING_KEY:G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=}
   githubTokenEncryptionKey: ${GITHUB_TOKEN_ENCRYPTION_KEY:A@GfQKGMLVsZP2CDPK@}
 
 logging:

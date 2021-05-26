@@ -163,7 +163,7 @@ class TaggitService(private val githubService: GithubService,
         val tagsJsonBQuery = tags.map {
             "r.metadata @> '{\"tags\":[\"$it\"]}'"
         }.joinToString(" OR ")
-        val sqlToExecute = "SELECT * FROM repo r WHERE r.user_id = '$userId' and ${tagsJsonBQuery} order by r.repo_name asc"
+        val sqlToExecute = "SELECT * FROM repo r WHERE r.user_id = '$userId' and $tagsJsonBQuery order by r.repo_name asc"
         entityManagerFactory.createEntityManager()
         return entityManagerFactory.createEntityManager()
             .createNativeQuery(sqlToExecute)

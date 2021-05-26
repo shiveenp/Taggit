@@ -3,7 +3,9 @@ package com.shiveenp.taggit.security
 import com.shiveenp.taggit.config.ExternalProperties
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.io.Encoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
 import java.util.*
@@ -12,6 +14,8 @@ import java.util.*
 class TokenHandlerService(private val externalProperties: ExternalProperties) {
 
     fun saveUserIdAndGetJwt(userId: UUID, authToken: String): String {
+        val key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+        println(Encoders.BASE64.encode(key.encoded))
         return Jwts.builder()
             .setSubject(userId.toString())
             .setIssuer("taggit")
