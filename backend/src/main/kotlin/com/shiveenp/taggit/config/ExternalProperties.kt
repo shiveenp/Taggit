@@ -10,5 +10,6 @@ import org.springframework.core.annotation.Order
 data class ExternalProperties(
     val uiUrl: String,
     val turnOffSessionTokenCheck: String?,
-    val jwtSigningKey: String
+    val jwtSigningKey: String,
+    val githubTokenEncryptionKey: String
 )

@@ -2,14 +2,15 @@ package com.shiveenp.taggit.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.shiveenp.taggit.config.ExternalProperties
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserEntity
 import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.models.*
+import com.shiveenp.taggit.security.EncryptorService
 import com.shiveenp.taggit.util.toUUID
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
@@ -38,29 +39,33 @@ class TaggitService(private val githubService: GithubService,
                     private val repoRepository: TaggitRepoRepository,
                     private val clientService: ReactiveOAuth2AuthorizedClientService,
                     private val entityManagerFactory: EntityManagerFactory,
+                    private val encryptorService: EncryptorService,
+                    private val externalProperties: ExternalProperties,
                     private val mapper: ObjectMapper) {
 
     private val logger = KotlinLogging.logger { }
 
+
     suspend fun loginOrRegister(): Pair<TaggitUser, String> {
         val githubUser = githubService.getUserData()
         val existingUser = userRepository.findByGithubUserId(githubUser.id)
+        val githubToken = getGithubOauthToken()
+        val encryptedToken = encryptorService.encrypt(githubToken, externalProperties.githubTokenEncryptionKey)
         val user = if (existingUser != null) {
             userRepository.save(existingUser
                 .toDto()
-                .updateUsing(githubUser)
+                .updateUsing(githubUser, encryptedToken)
                 .toEntity())
                 .toDto()
         } else {
-            userRepository.save(TaggitUserEntity.from(githubUser)).toDto()
+            userRepository.save(TaggitUserEntity.from(githubUser, encryptedToken)).toDto()
         }
-        val githubToken = getGithubOauthToken()
         return (user to githubToken)
     }
 
     suspend fun getGithubOauthToken(): String {
         return ReactiveSecurityContextHolder.getContext().flatMap {
-            var token = "";
+            var token = ""
             val authToken = it.authentication as OAuth2AuthenticationToken
             clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name)
                 .doOnSuccess {

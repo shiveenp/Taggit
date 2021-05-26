@@ -1,19 +1,17 @@
 package com.shiveenp.taggit.service
 
+import com.shiveenp.taggit.config.ExternalProperties
 import com.shiveenp.taggit.db.TaggitRepoEntity
 import com.shiveenp.taggit.db.TaggitRepoRepository
+import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
+import com.shiveenp.taggit.security.EncryptorService
+import com.shiveenp.taggit.security.TokenHandlerService
 import com.shiveenp.taggit.util.GithubAuthException
 import com.shiveenp.taggit.util.notContains
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.reactive.asFlow
 import mu.KotlinLogging
 import org.springframework.http.ResponseEntity
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
-import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 /**
@@ -23,18 +21,25 @@ import java.util.*
 @Suppress("ReactiveStreamsUnusedPublisher")
 @Service
 class RepoSyncService(
-    val githubService: GithubService,
-    val taggitRepoRepository: TaggitRepoRepository,
-    val tokenHandlerService: TokenHandlerService
+    private val githubService: GithubService,
+    private val userRepository: TaggitUserRepository,
+    private val taggitRepoRepository: TaggitRepoRepository,
+    private val encryptorService: EncryptorService,
+    private val externalProperties: ExternalProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun syncUserStargazingData(userId: UUID) {
         logger.info { "Syncing repos for user: $userId" }
-        val token = tokenHandlerService.getAuthTokenFromUserIdOrNull(userId)
-        if (token != null) {
-            val repos = getUserStarredReposToSync(token)
+        val encryptedToken = userRepository.findById(userId).orElse(null)?.githubToken
+        if (encryptedToken != null) {
+            val repos = getUserStarredReposToSync(
+                encryptorService.decrypt(
+                    encryptedToken,
+                    externalProperties.githubTokenEncryptionKey
+                )
+            )
             val existingRepos = taggitRepoRepository.findAll()
             val currentSyncedRepoIds = existingRepos.map { it.repoId }
             repos.filter {

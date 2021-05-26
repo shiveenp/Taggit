@@ -11,6 +11,7 @@ data class TaggitUser(
     val avatarUrl: String?,
     val githubUserName: String,
     val githubUserId: Long,
+    val githubToken: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -21,13 +22,14 @@ data class TaggitUser(
         )
     }
 
-    fun updateUsing(githubUser: GithubUser): TaggitUser {
+    fun updateUsing(githubUser: GithubUser, githubToken: String?): TaggitUser {
         return this.copy(
             userName = githubUser.name ?: githubUser.login,
             email = githubUser.email,
             avatarUrl = githubUser.avatarUrl,
             githubUserName = githubUser.login,
-            githubUserId = githubUser.id
+            githubUserId = githubUser.id,
+            githubToken = githubToken
         )
     }
 
@@ -39,6 +41,7 @@ data class TaggitUser(
             avatarUrl = this.avatarUrl,
             githubUserName = this.githubUserName,
             githubUserId = this.githubUserId,
+            githubToken = this.githubToken,
             createdAt = this.createdAt,
             updatedAt = this.updatedAt
         )

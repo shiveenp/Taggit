@@ -9,7 +9,8 @@ data class GithubUser(
     @JsonProperty("avatar_url")
     val avatarUrl: String,
     val name: String?,
-    val email: String?
+    val email: String?,
+    val githubToken: String?
 )
 
 data class GithubStargazingResponse(

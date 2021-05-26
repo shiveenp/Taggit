@@ -1,7 +1,7 @@
-package com.shiveenp.taggit.config
+package com.shiveenp.taggit.api
 
-import com.shiveenp.taggit.service.TokenHandlerService
-import com.shiveenp.taggit.util.toUUID
+import com.shiveenp.taggit.config.ExternalProperties
+import com.shiveenp.taggit.security.TokenHandlerService
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -13,7 +13,8 @@ import reactor.core.publisher.Mono
 
 @Component
 class SessionKeyFilter(val externalProperties: ExternalProperties,
-                       val tokenHandlerService: TokenHandlerService) : HandlerFilterFunction<ServerResponse?, ServerResponse?> {
+                       val tokenHandlerService: TokenHandlerService
+) : HandlerFilterFunction<ServerResponse?, ServerResponse?> {
     private val logger = KotlinLogging.logger { }
     override fun filter(request: ServerRequest,
                         handlerFunction: HandlerFunction<ServerResponse?>): Mono<ServerResponse?> {
@@ -22,8 +23,8 @@ class SessionKeyFilter(val externalProperties: ExternalProperties,
         return if (shouldCheckSessionToken) {
             val userId = request.pathVariable("userId")
             val sessionTokenInHeader = request.headers().firstHeader(SESSION_KEY_HEADER)
-            val sessionTokenInMemory = tokenHandlerService.getSessionTokenFromUserIdOrNull(userId.toUUID())
-            if (doSessionTokenMatch(sessionTokenInHeader, sessionTokenInMemory)) {
+            val verifiedUserId = tokenHandlerService.getUserIdFromJwtClaims(sessionTokenInHeader ?: "")
+            if (verifiedUserId != null && verifiedUserId == userId) {
                 handlerFunction.handle(request)
             } else {
                 logger.debug { "Request denied since tokens don't match" }
@@ -31,14 +32,6 @@ class SessionKeyFilter(val externalProperties: ExternalProperties,
             }
         } else {
             handlerFunction.handle(request)
-        }
-    }
-
-    fun doSessionTokenMatch(sessionTokenInHeader: String?, sessionTokenInMemory: String?): Boolean {
-        return if (sessionTokenInHeader != null && sessionTokenInMemory != null) {
-            sessionTokenInHeader == sessionTokenInMemory
-        } else {
-            false
         }
     }
 
