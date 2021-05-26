@@ -15,16 +15,12 @@ spring:
       enabled: always
   flyway:
     enabled: true
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-  session:
-    store-type: redis
 
 external:
   uiUrl: http://localhost:8081
   turnOffSessionTokenCheck: false
   jwtSigningKey: G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=
+  githubTokenEncryptionKey: ${GITHUB_TOKEN_ENCRYPTION_KEY:A@GfQKGMLVsZP2CDPK@}
 
 logging:
   level:

@@ -18,6 +18,7 @@ data class TaggitUserEntity(
     val avatarUrl: String?,
     val githubUserName: String,
     val githubUserId: Long,
+    val githubToken: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -29,13 +30,14 @@ data class TaggitUserEntity(
             avatarUrl = this.avatarUrl,
             githubUserName = this.githubUserName,
             githubUserId = this.githubUserId,
+            githubToken = this.githubToken,
             createdAt = this.createdAt,
             updatedAt = this.updatedAt
         )
     }
 
     companion object {
-        fun from(githubUser: GithubUser): TaggitUserEntity {
+        fun from(githubUser: GithubUser, githubToken: String?): TaggitUserEntity {
             return TaggitUserEntity(
                 id = UUID.randomUUID(),
                 userName = githubUser.name ?: githubUser.login,
@@ -43,6 +45,7 @@ data class TaggitUserEntity(
                 avatarUrl = githubUser.avatarUrl,
                 githubUserName = githubUser.login,
                 githubUserId = githubUser.id,
+                githubToken = githubToken,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
             )

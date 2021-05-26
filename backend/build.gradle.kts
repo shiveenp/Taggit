@@ -26,9 +26,6 @@ dependencies {
     implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-    implementation("org.springframework.session:spring-session-core")
-    implementation("org.springframework.session:spring-session-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     // see: https://github.com/jobrunr/jobrunr/issues/77 to remove this in the future
     implementation("org.jobrunr:jobrunr:1.0.0-SNAPSHOT") // not needed as jobrunr-kotlin-support pulls this in as a transient dependency
     implementation("org.jobrunr:jobrunr-spring-boot-starter:1.0.0-SNAPSHOT")
@@ -44,6 +41,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
+    implementation("com.soywiz.korlibs.krypto:krypto:2.1.1")
     implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
 
     // kotlin
@@ -66,6 +64,7 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("io.github.serpro69:kotlin-faker:1.5.0")
     testImplementation("org.apache.commons:commons-math3:3.6.1")
+    testImplementation("io.kotest:kotest-assertions-core:4.6.0")
 }
 
 tasks.withType<Test> {

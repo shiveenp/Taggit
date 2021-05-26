@@ -21,8 +21,9 @@ fun generateMockUserEntity() =
         avatarUrl = "http://google.com",
         githubUserName = faker.name.neutralFirstName(),
         githubUserId = randomNumberGenerator.nextLong(Long.MIN_VALUE, Long.MAX_VALUE),
+        githubToken = "random_token",
         createdAt = LocalDateTime.now(),
-        updatedAt = LocalDateTime.now()
+        updatedAt = LocalDateTime.now(),
     )
 
 fun generateMockRepoEntity(userId: UUID? = null,
