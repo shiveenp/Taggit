@@ -14,8 +14,6 @@ import java.util.*
 class TokenHandlerService(private val externalProperties: ExternalProperties) {
 
     fun saveUserIdAndGetJwt(userId: UUID, authToken: String): String {
-        val key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-        println(Encoders.BASE64.encode(key.encoded))
         return Jwts.builder()
             .setSubject(userId.toString())
             .setIssuer("taggit")

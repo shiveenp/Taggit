@@ -1,17 +1,24 @@
 version: '3'
 services:
-  backend:
-    container_name: 'backend'
-    image: 'backend:0.0.1-SNAPSHOT'
+  taggit:
+    container_name: 'taggit'
+    image: 'taggit:latest'
     ports:
       - '127.0.0.1:8080:8080'
     depends_on:
       - postgres
-      - redis
     networks:
       - default
     environment:
       - DATABASE_URL=jdbc:postgresql://postgres:5432/taggit
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=
+      - GITHUB_CLIENT_ID=8e2ad17939347dcd35f0
+      - GITHUB_CLIENT_SECRET=a02ed2a0a0b2493fa87f294f081e1cc196e65d98
+      - UI_URL=http://localhost:8081
+      - TURN_OFF_SESSION_TOKEN_CHECK=false
+      - JWT_SIGNING_KEY=G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=
+      - GITHUB_TOKEN_ENCRYPTION_KEY=GfQKGMLVsZP2CDPK
   postgres:
     container_name: 'postgres'
     image: 'postgres:9.5.3'
@@ -21,16 +28,6 @@ services:
       - 'pgdata:/var/lib/postgresql/data/'
     networks:
       - default
-  redis:
-    container_name: 'redis'
-    image: 'redis:3.2.0'
-    ports:
-      - '127.0.0.1:6379:6379'
-    volumes:
-      - 'redisdata:/data'
-    networks:
-      - default
 
 volumes:
   pgdata:
-  redisdata:
