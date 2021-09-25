@@ -10,7 +10,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "babel-loader": "^8.2.2",
     "babel-preset-vue": "^2.0.2",
     "buefy": "^0.8.20",
