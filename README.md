@@ -1,4 +1,4 @@
-# TAGGIT
+# Taggit
 
 Taggit allows users to connect their github accounts and manage their starred repos.
 
