@@ -135,7 +135,10 @@
               email: this.inputEmail
             },
             {
-              'Content-Type': 'application/json'
+              headers: {
+              'Content-Type': 'application/json',
+              "x-taggit-session-key": localStorage.getItem("taggit-session-token")
+              }
             }).then(response => {
           if (response.status === 200) {
             this.$buefy.toast.open({

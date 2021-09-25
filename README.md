@@ -14,7 +14,7 @@ Right now I'm working towards an alpha release and this is how it currently look
 
 The project is split into two a backend and front end. 
 
-The backend is written using Kotlin and based on the lightweight [http4k](https://github.com/http4k/http4k) web framework.
+The backend is written using Kotlin and Spring.
 
 The frontend is written using [VueJs](https://vuejs.org/) and accompanying libraries like Vuex and VueRouter etc.
 
@@ -25,7 +25,7 @@ You can run the backend by directly running the main class in the App.kt file or
 For running with Docker ensure you have docker installed, for Mac that can be done vie brew:
 
 ```shell script
-brew install docker
+brew install --cask docker
 ```
 
 Once docker is installed, navigate to the backend folder and run docker compose:

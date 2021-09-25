@@ -55,37 +55,14 @@
             </div>
         </div>
         <hr>
-        <section>
-            <div>
-                <footer class="footer">
-                    <div class="content has-text-centered">
-                        <p>
-                            <strong>TAGGIT</strong> by <a href="https://shiveenp.com">Shiveen Pandita</a>. The source
-                            code is
-                            licensed
-                            <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
-                            is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
-                        </p>
-                        <p>
-                            <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
-                            <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/shavz"><img
-                                    src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg"
-                                    alt="Buy me a coffee"><span style="margin-left:15px;font-size:28px !important;">Buy me a coffee</span></a>
-                        </p>
-                    </div>
-                </footer>
-            </div>
-        </section>
     </div>
 </template>
 
 <script>
   import {mapGetters} from "vuex";
-  import axios from "axios";
   import Repos from "../components/Repos";
   import TagsList from "../components/TagsList";
   import RepoSync from "../components/RepoSync";
-  import {TAGGIT_BASE_API_URL} from "../common/config";
 
   export default {
     name: "User",

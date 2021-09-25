@@ -17,7 +17,7 @@ services:
       - GITHUB_CLIENT_SECRET=a02ed2a0a0b2493fa87f294f081e1cc196e65d98
       - UI_URL=http://localhost:8081
       - TURN_OFF_SESSION_TOKEN_CHECK=false
-      - JWT_SIGNING_KEY=G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=
+      - JWT_SIGNING_KEY=G+sXE/8FwgtZle5jI/ZGhygponrnasd5YXmu0bIo0JiGYc=
       - GITHUB_TOKEN_ENCRYPTION_KEY=GfQKGMLVsZP2CDPK
   postgres:
     container_name: 'postgres'
