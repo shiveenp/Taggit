@@ -1,6 +1,6 @@
 import axios from "axios";
 import qs from "qs";
-import {TAGGIT_BASE_API_URL} from "../common/config";
+import {TAGGIT_BASE_API_URL} from "@/common/config";
 
 const state = {
   isSyncing: false,

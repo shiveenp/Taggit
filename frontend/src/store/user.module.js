@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TAGGIT_BASE_API_URL } from "../common/config";
+import { TAGGIT_BASE_API_URL } from "@/common/config";
 
 const state = {
   id: '',

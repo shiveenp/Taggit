@@ -26,9 +26,7 @@ const mutations = {
     }
   },
   removeTag(state, data) {
-    state.allTags = state.allTags.filter(function (value) {
-      return value !== data
-    });
+    state.allTags = state.allTags.filter(value => value !== data);
   },
   activateTag(state, data) {
     if (!state.activeTags.includes(data)) {
@@ -36,9 +34,7 @@ const mutations = {
     }
   },
   deactivateTag(state, data) {
-    state.activeTags = state.activeTags.filter(function (value) {
-      return value !== data
-    })
+    state.activeTags = state.activeTags.filter(value => value !== data);
   },
 };
 
