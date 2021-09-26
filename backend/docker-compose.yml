@@ -1,6 +1,7 @@
 version: '3'
 services:
   taggit:
+    profiles: ["all"]
     container_name: 'taggit'
     image: 'taggit:latest'
     ports:
@@ -13,13 +14,14 @@ services:
       - DATABASE_URL=jdbc:postgresql://postgres:5432/taggit
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=
-      - GITHUB_CLIENT_ID=8e2ad17939347dcd35f0
-      - GITHUB_CLIENT_SECRET=a02ed2a0a0b2493fa87f294f081e1cc196e65d98
+      - GITHUB_CLIENT_ID=
+      - GITHUB_CLIENT_SECRET=
       - UI_URL=http://localhost:8081
-      - TURN_OFF_SESSION_TOKEN_CHECK=false
-      - JWT_SIGNING_KEY=G+sXE/8FwgtZle5jI/ZGhygponrnasd5YXmu0bIo0JiGYc=
-      - GITHUB_TOKEN_ENCRYPTION_KEY=GfQKGMLVsZP2CDPK
+      - TURN_OFF_SESSION_TOKEN_CHECK=
+      - JWT_SIGNING_KEY=
+      - GITHUB_TOKEN_ENCRYPTION_KEY=
   postgres:
+    profiles: ["all", "db"]
     container_name: 'postgres'
     image: 'postgres:9.5.3'
     ports:
