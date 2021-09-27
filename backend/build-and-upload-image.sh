@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## clean build director
+./gradlew clean
+
+## build new
+./gradlew build -x test
+
+## set image tags
 image="shiveenp/taggit"
 registry="registry.digitalocean.com/side-projects"
 
