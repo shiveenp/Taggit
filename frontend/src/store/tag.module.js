@@ -41,7 +41,8 @@ const mutations = {
 const actions = {
   fetchAllTags({ commit }, params) {
     commit('fetchingData');
-    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos/tags', {
+    const userId = localStorage.getItem('taggit-userId');
+    axios.get(TAGGIT_BASE_API_URL + '/user/' + userId + '/repos/tags', {
       headers: {
         'Content-Type': 'application/json',
         "x-taggit-session-key": localStorage.getItem("taggit-session-token")

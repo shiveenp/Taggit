@@ -88,7 +88,7 @@
 </template>
 
 <script>
-  import {TAGGIT_BASE_API_URL} from "../common/config";
+  import {TAGGIT_BASE_API_URL} from "@/common/config";
   import {mapGetters} from "vuex";
   import axios from 'axios';
 
@@ -110,7 +110,7 @@
     },
     methods: {
       fetchUserDetails() {
-        this.$store.dispatch('fetchUser', {userId: this.$route.params.userId});
+        this.$store.dispatch('fetchUser');
       },
       enablePersonalInfoInput() {
         this.isInputDisabled = false;
@@ -130,7 +130,8 @@
           });
           return
         }
-        axios.put(TAGGIT_BASE_API_URL + '/user/' + this.$route.params.userId, {
+        const userId = localStorage.getItem('taggit-userId');
+        axios.put(TAGGIT_BASE_API_URL + '/user/' + userId, {
               userName: this.inputUserName,
               email: this.inputEmail
             },
@@ -166,7 +167,8 @@
       },
       deleteUserAccount() {
         this.isUserGettingDeleted = true;
-        axios.delete(TAGGIT_BASE_API_URL + '/user/' + this.$route.params.userId)
+        const userId = localStorage.getItem('taggit-userId');
+        axios.delete(TAGGIT_BASE_API_URL + '/user/' + userId)
             .then((response) => {
               this.isUserGettingDeleted = false;
               this.$buefy.toast.open({

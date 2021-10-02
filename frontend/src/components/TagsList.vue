@@ -18,7 +18,7 @@
     },
     methods: {
       fetchAllTags() {
-        this.$store.dispatch('fetchAllTags', {userId: this.$route.params.userId});
+        this.$store.dispatch('fetchAllTags');
       },
     },
     mounted() {

@@ -52,7 +52,8 @@ const mutations = {
 const actions = {
   resyncRepos({commit}, params) {
     commit("changeIsSyncing", true)
-    axios.get(TAGGIT_BASE_API_URL + "/user/" + params.userId + "/repos/sync", {
+    const userId = localStorage.getItem('taggit-userId');
+    axios.get(TAGGIT_BASE_API_URL + "/user/" + userId + "/repos/sync", {
       headers: {
         "x-taggit-session-key": localStorage.getItem("taggit-session-token")
       }
@@ -67,7 +68,8 @@ const actions = {
   ,
   fetchRepos({commit}, params) {
     commit('fetchingData');
-    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos' + '?pageNm=' + (state.pageNm - 1) + '&pageSize=' + state.pageSize, {
+    const userId = localStorage.getItem('taggit-userId');
+    axios.get(TAGGIT_BASE_API_URL + '/user/' + userId + '/repos' + '?pageNm=' + (state.pageNm - 1) + '&pageSize=' + state.pageSize, {
       headers: {
         'Content-Type': 'application/json',
         "x-taggit-session-key": localStorage.getItem("taggit-session-token")
@@ -84,7 +86,8 @@ const actions = {
   },
   fetchReposUsingTags({commit}, params) {
     commit('fetchingData');
-    axios.get(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos/search', {
+    const userId = localStorage.getItem('taggit-userId');
+    axios.get(TAGGIT_BASE_API_URL + '/user/' + userId + '/repos/search', {
       params: {
         tag: params.tags
       },
@@ -105,7 +108,8 @@ const actions = {
         });
   },
   addTagToRepo({commit}, params) {
-    axios.post(TAGGIT_BASE_API_URL + '/user/' + params.userId + '/repos/' + params.repoId + '/tag',
+    const userId = localStorage.getItem('taggit-userId');
+    axios.post(TAGGIT_BASE_API_URL + '/user/' + userId + '/repos/' + params.repoId + '/tag',
         {
           tag: params.tag
         },

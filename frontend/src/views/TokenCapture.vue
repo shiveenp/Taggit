@@ -11,7 +11,8 @@ export default {
       let userId = this.$route.params.userId
       let token = this.$route.query.token
       localStorage.setItem("taggit-session-token", token)
-      this.$router.push(`/user/${userId}`)
+      localStorage.setItem("taggit-userId", userId)
+      this.$router.push(`/home`)
     }
   },
   created() {

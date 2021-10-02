@@ -65,7 +65,7 @@
   import RepoSync from "../components/RepoSync";
 
   export default {
-    name: "User",
+    name: "Home",
     components: {TagsList, Repos, RepoSync},
     computed: {
       ...mapGetters(["userName", "email", "githubUserName", "githubUserId", "isLoading", "reposToDisplay", "pageNm", "pageSize", "total", "activeTags",
@@ -73,14 +73,14 @@
     },
     methods: {
       fetchUserDetails() {
-        this.$store.dispatch('fetchUser', {userId: this.$route.params.userId});
+        this.$store.dispatch('fetchUser');
       },
       pageClickCallBack(pageNm) {
         this.$store.dispatch("changePageNm", pageNm)
-        this.$store.dispatch('fetchRepos', {userId: this.$route.params.userId});
+        this.$store.dispatch('fetchRepos');
       },
       gotoUpdateProfile() {
-        this.$router.push({name: 'account', params: {userId: this.$route.params.userId}});
+        this.$router.push({name: 'account'});
       }
     },
     created() {

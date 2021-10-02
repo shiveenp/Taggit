@@ -48,16 +48,18 @@ export default {
   name: "GithubRepo",
   methods: {
     saveTag(tag) {
+      const userId = localStorage.getItem('taggit-userId');
       this.$store.dispatch('addTagToRepo',
           {
-            userId: this.$route.params.userId,
+            userId: userId,
             repoId: this.id,
             tag: tag
           });
       this.$store.dispatch('addTag', tag);
     },
     removeTag(tag) {
-      axios.delete(TAGGIT_BASE_API_URL + '/user/' + this.$route.params.userId + '/repos/' + this.id + '/tag?tag=' + tag, {
+      const userId = localStorage.getItem('taggit-userId');
+      axios.delete(TAGGIT_BASE_API_URL + '/user/' + userId + '/repos/' + this.id + '/tag?tag=' + tag, {
         headers: {
           "x-taggit-session-key": localStorage.getItem("taggit-session-token")
         }

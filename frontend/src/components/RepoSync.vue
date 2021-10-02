@@ -19,7 +19,7 @@
     },
     methods: {
       resyncRepos() {
-        this.$store.dispatch('resyncRepos', {vmInstance: this, userId: this.$route.params.userId});
+        this.$store.dispatch('resyncRepos', {vmInstance: this});
       }
     }
   }

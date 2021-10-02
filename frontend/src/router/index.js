@@ -12,8 +12,8 @@ const router = new Router({
   routes: [
     {path: '/', name: 'login', component: Login},
     {path: "/user/:userId/token", name: 'tokenCapture', component: TokenCapture},
-    {path: '/user/:userId', name: 'home', component: Home},
-    {path: '/user/:userId/account', name: 'account', component: Account},
+    {path: '/home', name: 'home', component: Home},
+    {path: '/account', name: 'account', component: Account},
 
     // otherwise redirect to home
     {path: '*', redirect: '/'}

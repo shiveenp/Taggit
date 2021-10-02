@@ -38,15 +38,15 @@
       // eslint-disable-next-line no-unused-vars
       activeTags(newValue, oldValue) {
         if (newValue.length > 0) {
-          this.$store.dispatch('fetchReposUsingTags', {userId: this.$route.params.userId, tags: newValue});
+          this.$store.dispatch('fetchReposUsingTags', {tags: newValue});
         } else {
-          this.$store.dispatch('fetchRepos', {userId: this.$route.params.userId});
+          this.$store.dispatch('fetchRepos');
         }
       }
     },
     methods: {
       fetchUserRepos() {
-        this.$store.dispatch('fetchRepos', {userId: this.$route.params.userId});
+        this.$store.dispatch('fetchRepos');
       }
     },
     created() {
