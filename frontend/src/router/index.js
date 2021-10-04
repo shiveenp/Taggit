@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Login from '../views/Login'
 import Home from "../views/Home";
 import Account from "../views/Account";
+import LandingPage from "@/views/LandingPage";
 import TokenCapture from '@/views/TokenCapture';
 
 Vue.use(Router);
@@ -10,7 +11,8 @@ Vue.use(Router);
 const router = new Router({
   mode: 'history',
   routes: [
-    {path: '/', name: 'login', component: Login},
+    {path: '/', name: 'landingPage', component: LandingPage},
+    {path: "/login", name: 'login', component: Login},
     {path: "/user/:userId/token", name: 'tokenCapture', component: TokenCapture},
     {path: '/home', name: 'home', component: Home},
     {path: '/account', name: 'account', component: Account},

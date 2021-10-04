@@ -8,6 +8,7 @@
   import { TAGGIT_BASE_API_URL } from "@/common/config";
 
   export default {
+    name: "Login",
     methods: {
       login: function () {
         window.location = `${TAGGIT_BASE_API_URL}/signin`;

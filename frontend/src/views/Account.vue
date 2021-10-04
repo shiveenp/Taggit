@@ -93,7 +93,7 @@
   import axios from 'axios';
 
   export default {
-    name: "UpdateProfile",
+    name: "Account",
     computed: {
       userGithubLink: function () {
         return 'https://github.com/' + this.githubUserName;
