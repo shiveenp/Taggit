@@ -8,7 +8,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsConfigurationSource
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
-import java.util.*
 
 
 @EnableWebFluxSecurity
@@ -40,7 +39,7 @@ class SecurityConfiguration {
         corsConfig.addAllowedMethod(HttpMethod.PUT)
         corsConfig.addAllowedMethod(HttpMethod.POST)
         corsConfig.addAllowedMethod(HttpMethod.DELETE)
-        corsConfig.allowedOrigins = Arrays.asList(FRONTEND_LOCALHOST)
+        corsConfig.allowedOrigins = listOf(FRONTEND_LOCAL, FRONTEND_PROD)
         corsConfig.allowCredentials = true
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", corsConfig)
@@ -48,6 +47,7 @@ class SecurityConfiguration {
     }
 
     companion object {
-        private const val FRONTEND_LOCALHOST = "http://localhost:8081"
+        private const val FRONTEND_LOCAL = "http://localhost:8081"
+        private const val FRONTEND_PROD = "https://taggit.app"
     }
 }

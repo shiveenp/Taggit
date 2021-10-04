@@ -2,12 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("org.springframework.boot") version "2.3.0.RELEASE"
-    id("io.spring.dependency-management") version "1.0.9.RELEASE"
-    kotlin("jvm") version "1.4.0"
-    kotlin("plugin.spring") version "1.4.0"
-    kotlin("plugin.jpa") version "1.4.0"
-    kotlin("kapt") version "1.4.0"
+    id("org.springframework.boot") version "2.5.5"
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.spring") version "1.5.31"
+    kotlin("plugin.jpa") version "1.5.31"
+    kotlin("kapt") version "1.5.31"
 }
 
 group = "com.shiveenp"
@@ -15,7 +15,6 @@ version = "1.0"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
-    jcenter()
     mavenCentral()
     mavenLocal()
 }
