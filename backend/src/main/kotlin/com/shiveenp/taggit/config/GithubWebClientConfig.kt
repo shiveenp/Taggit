@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class GithubWebClientConfig {
 
+    // todo: this needs to shift to using the actual token
     @Bean
     fun webClient(clientRegistrations: ReactiveClientRegistrationRepository?,
                   authorizedClients: ServerOAuth2AuthorizedClientRepository?): WebClient? {
