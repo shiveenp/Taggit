@@ -27,8 +27,6 @@ dependencies {
     implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-    implementation("org.jobrunr:jobrunr-spring-boot-starter:2.0.1")
-    implementation("org.jobrunr:jobrunr-kotlin-support:2.0.1")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
     // utils
     implementation("com.vladmihalcea:hibernate-types-52:2.2.2")
@@ -38,6 +36,8 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
+//    implementation("org.springdoc:springdoc-openapi-ui:1.5.2")
+//    implementation("org.springdoc:springdoc-openapi-ui:1.5.2")
     implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
 
     // kotlin

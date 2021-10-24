@@ -57,7 +57,7 @@ class TaggitHandler(
 
     suspend fun syncRepos(req: ServerRequest): ServerResponse {
         val userId = getUserIdFromRequest(req)
-        return ok().bodyValueAndAwait(taggitService.syncUserRepos(userId))
+        return accepted().bodyValueAndAwait(taggitService.syncUserRepos(userId))
     }
 
     suspend fun getRepoTags(req: ServerRequest): ServerResponse {

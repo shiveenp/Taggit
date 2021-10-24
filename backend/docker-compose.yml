@@ -20,8 +20,9 @@ services:
       - TURN_OFF_SESSION_TOKEN_CHECK=
       - JWT_SIGNING_KEY=
       - GITHUB_TOKEN_ENCRYPTION_KEY=
+      - ACTIVE_PROFILE=local
   postgres:
-    profiles: ["all", "db"]
+    profiles: ["all", "infra"]
     container_name: 'postgres'
     image: 'postgres:9.5.3'
     ports:

@@ -15,6 +15,9 @@ spring:
       enabled: always
   flyway:
     enabled: true
+  profiles:
+    active: ${ACTIVE_PROFILE:local}
+    default: local
 
 external:
   uiUrl: ${UI_URL:http://localhost:8081}

@@ -1,9 +1,11 @@
 package com.shiveenp.taggit.api
 
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.server.coRouter
 
+@Profile("web", "local")
 @RestController
 class Router {
     @Bean
