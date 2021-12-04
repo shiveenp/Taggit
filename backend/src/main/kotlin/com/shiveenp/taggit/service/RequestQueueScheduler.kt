@@ -25,7 +25,6 @@ class RequestQueueScheduler(
     @Async
     @Scheduled(fixedRate = 5000)
     fun checkAndScheduleJob() {
-        logger.debug { "Checking for new request queue items..." }
         val newItem = requestQueueRepository.topItem()
         if (newItem != null) {
             val hasRequestInflight = inProgressItemsMap[newItem.userId] != null
@@ -45,7 +44,7 @@ class RequestQueueScheduler(
                 requestQueueRepository.markAsDoneFor(newItem.id)
                 inProgressItemsMap.remove(newItem.userId)
             } catch (ex: Exception) {
-                logger.error { "Unable to handle request queue item: ${newItem.id}" }
+                logger.error(ex) { "Unable to handle request queue item: ${newItem.id}" }
                 requestQueueRepository.markAsErrorFor(newItem.id)
             }
         }

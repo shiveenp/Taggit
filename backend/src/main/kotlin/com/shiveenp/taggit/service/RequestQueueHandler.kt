@@ -4,7 +4,6 @@ import com.shiveenp.taggit.db.RequestQueueEntity
 import com.shiveenp.taggit.models.RequestQueueType
 import mu.KotlinLogging
 import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Profile("worker", "local")

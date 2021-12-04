@@ -4,7 +4,7 @@ Taggit allows users to connect their github accounts and manage their starred re
 
 ## Motivation
 
-This project was borne out of my own need to be able organise several OSS projects that I routinely stared on github and have them allocated within neat tags.
+This project was borne out of my own need to be able to organise several OSS projects that I routinely stared on github and have them allocated within neat tags.
 
 Right now I'm working towards an alpha release and this is how it currently looks like:
 
@@ -30,12 +30,17 @@ brew install --cask docker
 
 Once docker is installed, navigate to the backend folder and run docker compose:
 
-```shell script
+```shell
 docker-compose up
 ```
 
+To run postgres only do:
 
-Once done, you'll need to also bootstrap the tables. Ideally this should be automated but I haven't gotten around to it. You can do that vie a flyway command:
+```shell
+docker-compose up --db
+```
+
+Once done, you'll need to also bootstrap the tables. Ideally this should be automated but I haven't gotten around to it. You can do that via a flyway command:
 
 ```shell script
 ./gradlew flywayMigrate
