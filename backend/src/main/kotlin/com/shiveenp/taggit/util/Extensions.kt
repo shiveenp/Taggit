@@ -1,5 +1,6 @@
 package com.shiveenp.taggit.util
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.net.URI
@@ -23,4 +24,8 @@ fun <T> List<T>.notContains(element: T): Boolean {
 
 fun Any.toJson(): String {
     return mapper.writeValueAsString(this)
+}
+
+inline fun <reified T> fromJson(json: String): T {
+    return mapper.readValue(json, object : TypeReference<T>() {})
 }

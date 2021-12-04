@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 class GithubWebClientConfig {
-
     @Bean
     fun webClient(clientRegistrations: ReactiveClientRegistrationRepository?,
                   authorizedClients: ServerOAuth2AuthorizedClientRepository?): WebClient? {

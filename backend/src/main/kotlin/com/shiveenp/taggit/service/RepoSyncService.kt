@@ -6,7 +6,6 @@ import com.shiveenp.taggit.db.TaggitRepoRepository
 import com.shiveenp.taggit.db.TaggitUserRepository
 import com.shiveenp.taggit.models.GithubStargazingResponse
 import com.shiveenp.taggit.security.EncryptorService
-import com.shiveenp.taggit.security.TokenHandlerService
 import com.shiveenp.taggit.util.GithubAuthException
 import com.shiveenp.taggit.util.notContains
 import mu.KotlinLogging
@@ -47,7 +46,9 @@ class RepoSyncService(
             }.forEach {
                 taggitRepoRepository.save(TaggitRepoEntity.from(userId, it))
             }
+            logger.info { "Finished syncing repos for user: $userId" }
         } else {
+            logger.error { "Encountered error while syncing github repos for user: $userId" }
             throw GithubAuthException("Unable to sync repos for $userId")
         }
     }

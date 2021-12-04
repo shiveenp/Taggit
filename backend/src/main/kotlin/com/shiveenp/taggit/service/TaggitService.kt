@@ -3,10 +3,7 @@ package com.shiveenp.taggit.service
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shiveenp.taggit.config.ExternalProperties
-import com.shiveenp.taggit.db.TaggitRepoEntity
-import com.shiveenp.taggit.db.TaggitRepoRepository
-import com.shiveenp.taggit.db.TaggitUserEntity
-import com.shiveenp.taggit.db.TaggitUserRepository
+import com.shiveenp.taggit.db.*
 import com.shiveenp.taggit.models.*
 import com.shiveenp.taggit.security.EncryptorService
 import com.shiveenp.taggit.util.toUUID
@@ -17,7 +14,6 @@ import mu.KotlinLogging
 import org.hibernate.type.IntegerType
 import org.hibernate.type.LongType
 import org.hibernate.type.StringType
-import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -28,19 +24,20 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.kotlin.core.publisher.toMono
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 import javax.persistence.EntityManagerFactory
 
-
 @Service
 class TaggitService(private val githubService: GithubService,
-                    private val repoSyncService: RepoSyncService,
                     private val userRepository: TaggitUserRepository,
                     private val repoRepository: TaggitRepoRepository,
                     private val clientService: ReactiveOAuth2AuthorizedClientService,
                     private val entityManagerFactory: EntityManagerFactory,
                     private val encryptorService: EncryptorService,
                     private val externalProperties: ExternalProperties,
+                    private val requestQueueRepository: RequestQueueRepository,
                     private val mapper: ObjectMapper) {
 
     private val logger = KotlinLogging.logger { }
@@ -110,9 +107,17 @@ class TaggitService(private val githubService: GithubService,
         )
     }
 
-    suspend fun syncUserRepos(userId: UUID): String {
-        BackgroundJob.enqueue { repoSyncService.syncUserStargazingData(userId) }
-        return "Started sync job for userId: $userId"
+    suspend fun syncUserRepos(userId: UUID) {
+        val requestQueueEntity = RequestQueueEntity(
+            UUID.randomUUID(),
+            userId,
+            RequestQueueType.GITHUB_REPO_SYNC.value,
+            null,
+            RequestQueueStatus.PENDING.value,
+            OffsetDateTime.now(ZoneOffset.UTC),
+            OffsetDateTime.now(ZoneOffset.UTC)
+        )
+        requestQueueRepository.save(requestQueueEntity)
     }
 
     suspend fun getDistinctTags(userId: UUID): Set<String> {
