@@ -1,18 +1,16 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    id("org.springframework.boot") version "2.5.5"
+    id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
-    kotlin("plugin.jpa") version "1.5.31"
-    kotlin("kapt") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.spring") version "1.6.10"
+    kotlin("plugin.jpa") version "1.6.10"
 }
 
 group = "com.shiveenp"
 version = "1.0"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -27,18 +25,17 @@ dependencies {
     implementation("org.springframework.security:spring-security-config")
     implementation("org.springframework.security:spring-security-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
     // utils
     implementation("com.vladmihalcea:hibernate-types-52:2.14.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.flywaydb:flyway-core:8.0.2")
-    implementation("io.github.microutils:kotlin-logging:2.0.11")
+    implementation("org.flywaydb:flyway-core:8.2.3")
+    implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
     // see: https://github.com/netty/netty/issues/11693
-    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.70.Final:osx-aarch_64")
+    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.72.Final:osx-aarch_64")
 
     // kotlin
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -58,9 +55,9 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.1")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("io.github.serpro69:kotlin-faker:1.8.0")
+    testImplementation("io.github.serpro69:kotlin-faker:1.9.0")
     testImplementation("org.apache.commons:commons-math3:3.6.1")
-    testImplementation("io.kotest:kotest-assertions-core:4.6.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.0.2")
 }
 
 tasks.withType<Test> {
@@ -70,11 +67,6 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
-}
-
-// https://docs.spring.io/spring-boot/docs/2.3.0.M1/gradle-plugin/reference/html/#packaging-layered-jars
-tasks.getByName<BootJar>("bootJar") {
-    layered()
 }
