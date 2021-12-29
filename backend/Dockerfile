@@ -5,7 +5,7 @@ COPY gradle gradle
 COPY build.gradle.kts .
 COPY src src
 RUN chmod +x gradlew
-RUN ./gradlew build -x test
+RUN ./gradlew bootJar
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} taggit.jar
 RUN java -Djarmode=layertools -jar taggit.jar extract
