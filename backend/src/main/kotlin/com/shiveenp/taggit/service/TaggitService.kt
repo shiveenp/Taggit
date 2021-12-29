@@ -30,15 +30,17 @@ import java.util.*
 import javax.persistence.EntityManagerFactory
 
 @Service
-class TaggitService(private val githubService: GithubService,
-                    private val userRepository: TaggitUserRepository,
-                    private val repoRepository: TaggitRepoRepository,
-                    private val clientService: ReactiveOAuth2AuthorizedClientService,
-                    private val entityManagerFactory: EntityManagerFactory,
-                    private val encryptorService: EncryptorService,
-                    private val externalProperties: ExternalProperties,
-                    private val requestQueueRepository: RequestQueueRepository,
-                    private val mapper: ObjectMapper) {
+class TaggitService(
+    private val githubService: GithubService,
+    private val userRepository: TaggitUserRepository,
+    private val repoRepository: TaggitRepoRepository,
+    private val clientService: ReactiveOAuth2AuthorizedClientService,
+    private val entityManagerFactory: EntityManagerFactory,
+    private val encryptorService: EncryptorService,
+    private val externalProperties: ExternalProperties,
+    private val requestQueueRepository: RequestQueueRepository,
+    private val mapper: ObjectMapper
+) {
 
     private val logger = KotlinLogging.logger { }
 
@@ -49,10 +51,12 @@ class TaggitService(private val githubService: GithubService,
         val githubToken = getGithubOauthToken()
         val encryptedToken = encryptorService.encrypt(githubToken, externalProperties.githubTokenEncryptionKey)
         val user = if (existingUser != null) {
-            userRepository.save(existingUser
-                .toDto()
-                .updateUsing(githubUser, encryptedToken)
-                .toEntity())
+            userRepository.save(
+                existingUser
+                    .toDto()
+                    .updateUsing(githubUser, encryptedToken)
+                    .toEntity()
+            )
                 .toDto()
         } else {
             userRepository.save(TaggitUserEntity.from(githubUser, encryptedToken)).toDto()
@@ -64,7 +68,10 @@ class TaggitService(private val githubService: GithubService,
         return ReactiveSecurityContextHolder.getContext().flatMap {
             var token = ""
             val authToken = it.authentication as OAuth2AuthenticationToken
-            clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(authToken.authorizedClientRegistrationId, authToken.name)
+            clientService.loadAuthorizedClient<OAuth2AuthorizedClient>(
+                authToken.authorizedClientRegistrationId,
+                authToken.name
+            )
                 .doOnSuccess {
                     token = it.accessToken.tokenValue
                 }.subscribe()
@@ -96,7 +103,11 @@ class TaggitService(private val githubService: GithubService,
     suspend fun getUserStarredRepos(userId: UUID, page: Int?, size: Int?): PagedResponse<TaggitRepo> {
         val pageNumber = page ?: DEFAULT_REPO_RESULT_PAGE_NUMBER
         val pageSize = size ?: DEFAULT_REPO_RESULT_PAGE_SIZE
-        val pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by("repoName").ascending()) // default sort is repos in ascending order
+        val pageRequest = PageRequest.of(
+            pageNumber,
+            pageSize,
+            Sort.by("repoName").ascending()
+        ) // default sort is repos in ascending order
         val dbReturnedPage = repoRepository.findAllByUserId(userId, pageRequest)
         val reposToReturn = dbReturnedPage.toList().map { it.toDto() }
         return PagedResponse(
@@ -164,38 +175,47 @@ class TaggitService(private val githubService: GithubService,
         }
     }
 
+    @Transactional(readOnly = true)
     suspend fun searchUserReposByTags(userId: UUID, tags: List<String>): List<Any> {
-        val tagsJsonBQuery = tags.map {
-            "r.metadata @> '{\"tags\":[\"$it\"]}'"
-        }.joinToString(" OR ")
-        val sqlToExecute = "SELECT * FROM repo r WHERE r.user_id = '$userId' and $tagsJsonBQuery order by r.repo_name asc"
-        entityManagerFactory.createEntityManager()
-        return entityManagerFactory.createEntityManager()
-            .createNativeQuery(sqlToExecute)
-            .unwrap(org.hibernate.query.NativeQuery::class.java)
-            .addScalar("id", StringType.INSTANCE)
-            .addScalar("user_id", StringType.INSTANCE)
-            .addScalar("repo_id", LongType.INSTANCE)
-            .addScalar("repo_name", StringType.INSTANCE)
-            .addScalar("github_link", StringType.INSTANCE)
-            .addScalar("github_description", StringType.INSTANCE)
-            .addScalar("star_count", IntegerType.INSTANCE)
-            .addScalar("owner_avatar_url", StringType.INSTANCE)
-            .addScalar("metadata", JsonNodeBinaryType.INSTANCE)
-            .resultList.map {
-                val node = mapper.valueToTree<JsonNode>(it)
+        val entityManager = entityManagerFactory.createEntityManager();
 
-                TaggitRepo(
-                    id = node[0].asText().toUUID(),
-                    userId = node[1].asText().toUUID(),
-                    repoId = node[2].asLong(),
-                    repoName = node[3].asText(),
-                    githubLink = node[4].asText(),
-                    githubDescription = node[5].asText(),
-                    ownerAvatarUrl = node[7].asText(),
-                    metadata = mapper.convertValue(node[8], Metadata::class.java)
-                )
-            }
+        try {
+            val tagsJsonBQuery = tags.map {
+                "r.metadata @> '{\"tags\":[\"$it\"]}'"
+            }.joinToString(" OR ")
+        val sqlToExecute =
+            "SELECT * FROM repo r WHERE r.user_id = '$userId' and $tagsJsonBQuery order by r.repo_name asc"
+            return entityManager.createNativeQuery(sqlToExecute)
+                .unwrap(org.hibernate.query.NativeQuery::class.java)
+                .addScalar("id", StringType.INSTANCE)
+                .addScalar("user_id", StringType.INSTANCE)
+                .addScalar("repo_id", LongType.INSTANCE)
+                .addScalar("repo_name", StringType.INSTANCE)
+                .addScalar("github_link", StringType.INSTANCE)
+                .addScalar("github_description", StringType.INSTANCE)
+                .addScalar("star_count", IntegerType.INSTANCE)
+                .addScalar("owner_avatar_url", StringType.INSTANCE)
+                .addScalar("metadata", JsonNodeBinaryType.INSTANCE)
+                .resultList.map {
+                    val node = mapper.valueToTree<JsonNode>(it)
+
+                    TaggitRepo(
+                        id = node[0].asText().toUUID(),
+                        userId = node[1].asText().toUUID(),
+                        repoId = node[2].asLong(),
+                        repoName = node[3].asText(),
+                        githubLink = node[4].asText(),
+                        githubDescription = node[5].asText(),
+                        ownerAvatarUrl = node[7].asText(),
+                        metadata = mapper.convertValue(node[8], Metadata::class.java)
+                    )
+                }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Unable to retrieve tags: $tags" }
+            return emptyList()
+        } finally {
+            entityManager.close()
+        }
     }
 
 
