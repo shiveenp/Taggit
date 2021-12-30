@@ -1,9 +1,9 @@
 FROM gradle:7.3.3-jdk17 as builder
-WORKDIR /taggit/
-COPY --chown=gradle:gradle . .
+COPY --chown=gradle:gradle . /home/gradle/src/
+WORKDIR /home/gradle/src
 RUN gradle bootJar
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} taggit.jar
+RUN ls -l
+COPY ./build/libs/backend-1.0.jar taggit.jar
 RUN java -Djarmode=layertools -jar taggit.jar extract
 
 FROM openjdk:17.0.1-slim
