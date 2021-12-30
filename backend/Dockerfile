@@ -6,11 +6,11 @@ RUN ls -l
 COPY ./build/libs/backend-1.0.jar taggit.jar
 RUN java -Djarmode=layertools -jar taggit.jar extract
 
-FROM openjdk:17.0.1-slim
-WORKDIR taggit
-COPY --from=builder taggit/dependencies/ ./
-COPY --from=builder taggit/spring-boot-loader/ ./
-COPY --from=builder taggit/snapshot-dependencies/ ./
-COPY --from=builder taggit/application/ ./
-EXPOSE 8080
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+#FROM openjdk:17.0.1-slim
+#WORKDIR taggit
+#COPY --from=builder taggit/dependencies/ ./
+#COPY --from=builder taggit/spring-boot-loader/ ./
+#COPY --from=builder taggit/snapshot-dependencies/ ./
+#COPY --from=builder taggit/application/ ./
+#EXPOSE 8080
+#ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
