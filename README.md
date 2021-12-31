@@ -6,9 +6,6 @@ Taggit allows users to connect their github accounts and manage their starred re
 
 This project was borne out of my own need to be able to organise several OSS projects that I routinely stared on github and have them allocated within neat tags.
 
-Right now I'm working towards an alpha release and this is how it currently looks like:
-
-![](./assets/taggit_screenshot.png)
 
 ## Project setup
 

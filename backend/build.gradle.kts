@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.jpa") version "1.6.10"
 }
 
-group = "com.shiveenp"
+group = "io.shiveenp"
 version = "1.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
@@ -21,14 +21,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.security:spring-security-config")
-    implementation("org.springframework.security:spring-security-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-jose")
     // utils
-    implementation("com.vladmihalcea:hibernate-types-52:2.14.0")
+    implementation("com.vladmihalcea:hibernate-types-55:2.14.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.flywaydb:flyway-core:8.2.3")
+    implementation("org.flywaydb:flyway-core:8.3.0")
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")

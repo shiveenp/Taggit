@@ -1,9 +1,9 @@
 version: '3'
 services:
   taggit:
-    profiles: ["all"]
+    profiles: ["prod"]
     container_name: 'taggit'
-    image: 'taggit:latest'
+    image: 'shiveenp/taggit:latest'
     ports:
       - '127.0.0.1:8080:8080'
     depends_on:
@@ -11,28 +11,40 @@ services:
     networks:
       - default
     environment:
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/taggit
+      - DATABASE_URL=jdbc:postgresql://postgres:5433/taggit
       - DATABASE_USERNAME=postgres
-      - DATABASE_PASSWORD=
-      - GITHUB_CLIENT_ID=
-      - GITHUB_CLIENT_SECRET=
+      - DATABASE_PASSWORD=postgres
+      - GITHUB_ACCESS_TOKEN=
+      - GITHUB_USER_NAME=
       - UI_URL=http://localhost:8081
-      - TURN_OFF_SESSION_TOKEN_CHECK=
-      - JWT_SIGNING_KEY=
-      - GITHUB_TOKEN_ENCRYPTION_KEY=
-      - ACTIVE_PROFILE=local
+      - ACTIVE_PROFILE=all
   postgres:
-    profiles: ["all", "infra"]
+    profiles: ["prod"]
     container_name: 'postgres'
     image: 'postgres:latest'
     ports:
-      - '127.0.0.1:5432:5432'
+      - '127.0.0.1:5432:5433'
     environment:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - 'pgdata:/var/lib/postgresql/data/'
     networks:
       - default
+  # This container is specifically created to deal with flyway checksum error which occurs if the app is started locally
+  # vs inside the container. The prod version of docker container runs specifically on a separate port to avoid conflict
+  postgres-test:
+    profiles: [ "test" ]
+    container_name: 'postgres-test'
+    image: 'postgres:latest'
+    ports:
+      - '127.0.0.1:5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - 'pgdata-testing:/var/lib/postgresql/data/'
+    networks:
+      - default
 
 volumes:
   pgdata:
+  pgdata-testing:
