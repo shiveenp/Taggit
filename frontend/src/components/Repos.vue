@@ -16,7 +16,7 @@
             <div class="hero-body">
                 <div class="container">
                     <h3 class="title is-centered no-repos">
-                        No repos found, either sync or go on starring at Github
+                        Click Sync above to get started
                     </h3>
                 </div>
             </div>
@@ -25,10 +25,10 @@
 </template>
 
 <script>
-  import GithubRepo from "./GitHubRepo";
-  import {mapGetters} from "vuex";
+import GithubRepo from "./GitHubRepo";
+import {mapGetters} from "vuex";
 
-  export default {
+export default {
     name: "Repos",
     components: {GithubRepo},
     computed: {

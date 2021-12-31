@@ -3,13 +3,6 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/taggit}
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
-  security:
-    oauth2:
-      client:
-        registration:
-          github:
-            clientId: ${GITHUB_CLIENT_ID}
-            clientSecret: ${GITHUB_CLIENT_SECRET}
   output:
     ansi:
       enabled: always
@@ -18,14 +11,18 @@ spring:
   profiles:
     active: ${ACTIVE_PROFILE:local}
     default: local
+  jpa:
+    properties:
+      hibernate:
+        types:
+          print:
+            banner: false
 
 external:
-  uiUrl: ${UI_URL:http://localhost:8081}
-  turnOffSessionTokenCheck: ${TURN_OFF_SESSION_TOKEN_CHECK:false}
-  jwtSigningKey: ${JWT_SIGNING_KEY:G+sXE/8FwgtZle5jI/ZGhygponrn5YXmu0bIo0JiGYc=}
-  githubTokenEncryptionKey: ${GITHUB_TOKEN_ENCRYPTION_KEY:A@GfQKGMLVsZP2CDPK@}
+  githubUserName: ${GITHUB_USER_NAME:}
+  githubAccessToken: ${GITHUB_ACCESS_TOKEN:}
 
 logging:
   level:
     root: info
-    com.shiveenp.taggit: debug
+    io.shiveenp.taggit: debug
