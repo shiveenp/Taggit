@@ -101,6 +101,18 @@ const actions = {
                 throw new Error(error);
             });
     },
+    fetchUntaggedRepos({commit}, params) {
+        commit('fetchingData');
+        axios.get(TAGGIT_BASE_API_URL + '/repos/untagged')
+            .then(({data}) => {
+                commit('getActiveTagRepoData', data);
+                commit('fetchFinished')
+            })
+            .catch(error => {
+                commit('fetchFinished');
+                throw new Error(error);
+            });
+    },
     addTagToRepo({commit}, params) {
         axios.post(TAGGIT_BASE_API_URL + '/repos/' + params.repoId + '/tag',
             {

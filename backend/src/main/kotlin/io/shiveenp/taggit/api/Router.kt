@@ -20,6 +20,7 @@ class Router {
 
         "/repos".nest {
             GET("", taggitHandler::getRepos)
+            GET("/untagged", taggitHandler::searchUntaggedRepos)
             GET("/sync", taggitHandler::syncRepos)
             GET("/tags", taggitHandler::getRepoTags)
             POST("/{repoId}/tag", taggitHandler::addTagToRepo)

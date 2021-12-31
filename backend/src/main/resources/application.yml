@@ -21,6 +21,7 @@ spring:
 external:
   githubUserName: ${GITHUB_USER_NAME:}
   githubAccessToken: ${GITHUB_ACCESS_TOKEN:}
+  uiUrl: ${UI_URL:http://localhost:8081}
 
 logging:
   level:

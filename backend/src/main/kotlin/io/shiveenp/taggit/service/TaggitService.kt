@@ -98,6 +98,10 @@ class TaggitService(
     }
 
     suspend fun addRepoTag(repoId: UUID, tagInput: TagInput): TaggitRepoEntity? {
+        val isUntaggedKeyword = tagInput.tag.equals(UNTAGGED_KEYWORD, true)
+        if (isUntaggedKeyword) {
+            throw IllegalArgumentException("Cannot use 'untagged' as it's reserved")
+        }
         return repoRepository.findByIdOrNull(repoId)?.let {
             val updatedMetadata = addTagToMetadata(it.metadata, tagInput.tag)
             repoRepository.save(it.withUpdated(metadata = updatedMetadata))
@@ -131,16 +135,24 @@ class TaggitService(
         }
     }
 
-    @Transactional(readOnly = true)
-    suspend fun searchUserReposByTags(tags: List<String>): List<Any> {
-        val entityManager = entityManagerFactory.createEntityManager();
+    suspend fun getUntaggedRepos(): List<Any> {
+        val sqlToExecute = "SELECT * FROM repo r WHERE r.metadata is null OR r.metadata @> '{\"tags\": []}' OR r.metadata @> '{}' order by r.repo_name asc"
+        return executeSqlOnRepos(sqlToExecute)
+    }
 
-        try {
-            val tagsJsonBQuery = tags.map {
-                "r.metadata @> '{\"tags\":[\"$it\"]}'"
-            }.joinToString(" OR ")
+    suspend fun searchUserReposByTags(tags: List<String>): List<Any> {
+        val tagsJsonBQuery = tags.map {
+            "r.metadata @> '{\"tags\":[\"$it\"]}'"
+        }.joinToString(" OR ")
         val sqlToExecute =
             "SELECT * FROM repo r WHERE $tagsJsonBQuery order by r.repo_name asc"
+        return executeSqlOnRepos(sqlToExecute)
+    }
+
+    @Transactional(readOnly = true)
+    fun executeSqlOnRepos(sqlToExecute: String): List<Any> {
+        val entityManager = entityManagerFactory.createEntityManager()
+        try {
             return entityManager.createNativeQuery(sqlToExecute)
                 .unwrap(org.hibernate.query.NativeQuery::class.java)
                 .addScalar("id", StringType.INSTANCE)
@@ -166,7 +178,7 @@ class TaggitService(
                     )
                 }
         } catch (ex: Exception) {
-            logger.error(ex) { "Unable to retrieve tags: $tags" }
+            logger.error(ex) { "Unable to retrieve tags" }
             return emptyList()
         } finally {
             entityManager.close()
@@ -177,5 +189,6 @@ class TaggitService(
     companion object {
         const val DEFAULT_REPO_RESULT_PAGE_NUMBER = 1
         const val DEFAULT_REPO_RESULT_PAGE_SIZE = 50
+        const val UNTAGGED_KEYWORD = "untagged";
     }
 }
