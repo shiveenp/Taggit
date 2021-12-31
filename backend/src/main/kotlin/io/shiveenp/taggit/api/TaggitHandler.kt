@@ -44,13 +44,17 @@ class TaggitHandler(
     }
 
     suspend fun addTagToRepo(req: ServerRequest): ServerResponse {
-        val repoId = req.pathVariable("repoId").toUUID()
-        val tagInput = req.awaitBody<TagInput>()
-        val updatedRepo = taggitService.addRepoTag(repoId, tagInput)
-        return if (updatedRepo != null) {
-            ok().bodyValueAndAwait(updatedRepo)
-        } else {
-            notFound().buildAndAwait()
+        return try {
+            val repoId = req.pathVariable("repoId").toUUID()
+            val tagInput = req.awaitBody<TagInput>()
+            val updatedRepo = taggitService.addRepoTag(repoId, tagInput)
+            if (updatedRepo != null) {
+                ok().bodyValueAndAwait(updatedRepo)
+            } else {
+                notFound().buildAndAwait()
+            }
+        } catch (ex: Exception) {
+            badRequest().bodyValueAndAwait(ex.localizedMessage)
         }
     }
 
@@ -64,6 +68,10 @@ class TaggitHandler(
     suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
         val tags = req.queryParams()["tag"] ?: emptyList()
         return ok().bodyValueAndAwait(taggitService.searchUserReposByTags(tags))
+    }
+
+    suspend fun searchUntaggedRepos(req: ServerRequest): ServerResponse {
+        return ok().bodyValueAndAwait(taggitService.getUntaggedRepos())
     }
 }
 

@@ -2,7 +2,7 @@ import axios from "axios";
 import {TAGGIT_BASE_API_URL} from "@/common/config";
 
 const state = {
-    allTags: [],
+    allTags: ['Untagged'],
     activeTags: []
 };
 
@@ -16,8 +16,10 @@ const getters = {
 };
 
 const mutations = {
-    getAllTags(state, data) {
-        state.allTags = data;
+    setAllTags(state, data) {
+        if (Array.isArray(data) && data !== undefined && data.length) {
+            state.allTags = state.allTags.concat(data);
+        }
     },
     addTag(state, data) {
         let presentIndex = state.allTags.findIndex(tag => tag === data);
@@ -43,7 +45,7 @@ const actions = {
         commit('fetchingData');
         axios.get(TAGGIT_BASE_API_URL + '/repos/tags')
             .then(({data}) => {
-                commit('getAllTags', data);
+                commit('setAllTags', data);
                 commit('fetchFinished')
             })
             .catch(error => {

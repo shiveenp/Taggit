@@ -58,12 +58,7 @@ export default {
       this.$store.dispatch('addTag', tag);
     },
     removeTag(tag) {
-      const userId = localStorage.getItem('taggit-userId');
-      axios.delete(TAGGIT_BASE_API_URL + '/user/' + userId + '/repos/' + this.id + '/tag?tag=' + tag, {
-        headers: {
-          "x-taggit-session-key": localStorage.getItem("taggit-session-token")
-        }
-      });
+      axios.delete(TAGGIT_BASE_API_URL + '/repos/' + this.id + '/tag?tag=' + tag);
       this.$store.dispatch('removeTag', tag);
     },
     mountTags() {

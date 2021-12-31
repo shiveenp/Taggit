@@ -38,7 +38,12 @@ export default {
       // eslint-disable-next-line no-unused-vars
       activeTags(newValue, oldValue) {
         if (newValue.length > 0) {
-          this.$store.dispatch('fetchReposUsingTags', {tags: newValue});
+          const tagMatchesUntaggedKeyWord = newValue.toString().localeCompare('untagged', undefined, { sensitivity: 'accent' })
+          if (tagMatchesUntaggedKeyWord === 0) {
+            this.$store.dispatch('fetchUntaggedRepos');
+          } else {
+            this.$store.dispatch('fetchReposUsingTags', {tags: newValue});
+          }
         } else {
           this.$store.dispatch('fetchRepos');
         }
