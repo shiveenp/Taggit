@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    // For packaging frontend assets
+    id("org.siouan.frontend-jdk11") version "6.0.0"
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.spring") version "1.6.10"
     kotlin("plugin.jpa") version "1.6.10"
@@ -66,3 +68,18 @@ tasks.withType<KotlinCompile> {
         jvmTarget = "17"
     }
 }
+
+//tasks.register<Copy>("processFrontendResources") {
+//    val frontendBuildDir = file("${project(":frontend")}/_static")
+//    val frontendResourcesDir = file("${project.buildDir}/resources/main/public")
+//
+//    group = "Frontend"
+//    description = "Process frontend resources"
+//    dependsOn(project(":frontend").tasks.named("assembleFrontend"))
+//
+//    from(frontendBuildDir, frontendResourcesDir)
+//}
+//
+//tasks.named("processResources") {
+//    dependsOn(tasks.named("processFrontendResources"))
+//}

@@ -35,7 +35,6 @@
 
 <script>
 import axios from "axios";
-import {TAGGIT_BASE_API_URL} from "../common/config";
 
 export default {
   data() {
@@ -58,7 +57,7 @@ export default {
       this.$store.dispatch('addTag', tag);
     },
     removeTag(tag) {
-      axios.delete(TAGGIT_BASE_API_URL + '/repos/' + this.id + '/tag?tag=' + tag);
+      axios.delete('/api/repos/' + this.id + '/tag?tag=' + tag);
       this.$store.dispatch('removeTag', tag);
     },
     mountTags() {

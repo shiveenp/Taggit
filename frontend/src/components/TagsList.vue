@@ -6,8 +6,6 @@
 
 <script>
   import TagButton from "./TagButton";
-  import axios from "axios";
-  import {TAGGIT_BASE_API_URL} from "../common/config";
   import {mapGetters} from "vuex";
 
   export default {

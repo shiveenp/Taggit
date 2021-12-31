@@ -1,5 +1,4 @@
 import axios from "axios";
-import {TAGGIT_BASE_API_URL} from "@/common/config";
 
 const state = {
     allTags: ['Untagged'],
@@ -43,7 +42,7 @@ const mutations = {
 const actions = {
     fetchAllTags({commit}, params) {
         commit('fetchingData');
-        axios.get(TAGGIT_BASE_API_URL + '/repos/tags')
+        axios.get('/api/repos/tags')
             .then(({data}) => {
                 commit('setAllTags', data);
                 commit('fetchFinished')
