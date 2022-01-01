@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":frontend"))
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -69,17 +70,17 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-//tasks.register<Copy>("processFrontendResources") {
-//    val frontendBuildDir = file("${project(":frontend")}/_static")
-//    val frontendResourcesDir = file("${project.buildDir}/resources/main/public")
-//
-//    group = "Frontend"
-//    description = "Process frontend resources"
-//    dependsOn(project(":frontend").tasks.named("assembleFrontend"))
-//
-//    from(frontendBuildDir, frontendResourcesDir)
-//}
-//
-//tasks.named("processResources") {
-//    dependsOn(tasks.named("processFrontendResources"))
-//}
+tasks.register<Copy>("processFrontendResources") {
+    val frontendBuildDir = file("${project(":frontend")}/_static")
+    val frontendResourcesDir = file("${project.buildDir}/resources/main/static")
+
+    group = "Frontend"
+    description = "Process frontend resources"
+    dependsOn(project(":frontend").tasks.named("assembleFrontend"))
+
+    from(frontendBuildDir, frontendResourcesDir)
+}
+
+tasks.named("processResources") {
+    dependsOn(tasks.named("processFrontendResources"))
+}
