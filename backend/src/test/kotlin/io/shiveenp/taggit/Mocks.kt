@@ -38,4 +38,3 @@ fun generateMockRepoEntity(userId: UUID? = null,
     )
 
 fun generateRandomTagInput(tag: String? = null) = TagInput(tag ?: faker.book.title())
-

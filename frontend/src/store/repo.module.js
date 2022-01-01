@@ -1,6 +1,5 @@
 import axios from "axios";
 import qs from "qs";
-import {TAGGIT_BASE_API_URL} from "@/common/config";
 
 const state = {
     isSyncing: false,
@@ -52,7 +51,7 @@ const mutations = {
 const actions = {
     resyncRepos({commit}, params) {
         commit("changeIsSyncing", true)
-        axios.get(TAGGIT_BASE_API_URL + "/repos/sync")
+        axios.get("/api/repos/sync")
             .then(response => {
                 params.vmInstance.$buefy.toast.open('Repo sync initiated in the background');
                 commit("changeIsSyncing", false);
@@ -64,12 +63,7 @@ const actions = {
     ,
     fetchRepos({commit}, params) {
         commit('fetchingData');
-        axios.get(TAGGIT_BASE_API_URL + '/repos' + '?pageNm=' + (state.pageNm - 1) + '&pageSize=' + state.pageSize, {
-            headers: {
-                'Content-Type': 'application/json',
-                "x-taggit-session-key": localStorage.getItem("taggit-session-token")
-            }
-        })
+        axios.get('/api/repos' + '?pageNm=' + (state.pageNm - 1) + '&pageSize=' + state.pageSize)
             .then(({data}) => {
                 commit('getRepoData', data);
                 commit('fetchFinished')
@@ -81,17 +75,13 @@ const actions = {
     },
     fetchReposUsingTags({commit}, params) {
         commit('fetchingData');
-        axios.get(TAGGIT_BASE_API_URL + '/repos/search', {
+        axios.get('/api/repos/search', {
             params: {
                 tag: params.tags
             },
             paramsSerializer: function (params) {
                 return qs.stringify(params, {arrayFormat: 'repeat'})
             },
-            headers: {
-                'Content-Type': 'application/json',
-                "x-taggit-session-key": localStorage.getItem("taggit-session-token")
-            }
         }).then(({data}) => {
             commit('getActiveTagRepoData', data);
             commit('fetchFinished')
@@ -103,7 +93,7 @@ const actions = {
     },
     fetchUntaggedRepos({commit}, params) {
         commit('fetchingData');
-        axios.get(TAGGIT_BASE_API_URL + '/repos/untagged')
+        axios.get('/api/repos/untagged')
             .then(({data}) => {
                 commit('getActiveTagRepoData', data);
                 commit('fetchFinished')
@@ -114,15 +104,9 @@ const actions = {
             });
     },
     addTagToRepo({commit}, params) {
-        axios.post(TAGGIT_BASE_API_URL + '/repos/' + params.repoId + '/tag',
+        axios.post('/api/repos/' + params.repoId + '/tag',
             {
                 tag: params.tag
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    "x-taggit-session-key": localStorage.getItem("taggit-session-token")
-                }
             });
     },
     changePageNm({commit}, data) {

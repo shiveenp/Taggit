@@ -10,22 +10,20 @@ import org.springframework.web.reactive.function.server.coRouter
 class Router {
     @Bean
     fun routes(taggitHandler: TaggitHandler) = coRouter {
-        "/".nest {
-            GET("signin", taggitHandler::loginOrSignup)
-        }
+        "/api".nest {
+            "/user".nest {
+                GET("/", taggitHandler::getUser)
+            }
 
-        "/user".nest {
-            GET("/", taggitHandler::getUser)
-        }
-
-        "/repos".nest {
-            GET("", taggitHandler::getRepos)
-            GET("/untagged", taggitHandler::searchUntaggedRepos)
-            GET("/sync", taggitHandler::syncRepos)
-            GET("/tags", taggitHandler::getRepoTags)
-            POST("/{repoId}/tag", taggitHandler::addTagToRepo)
-            DELETE("/{repoId}/tag", taggitHandler::deleteTagFromRepo)
-            GET("/search", taggitHandler::searchRepoByTags)
+            "/repos".nest {
+                GET("", taggitHandler::getRepos)
+                GET("/untagged", taggitHandler::searchUntaggedRepos)
+                GET("/sync", taggitHandler::syncRepos)
+                GET("/tags", taggitHandler::getRepoTags)
+                POST("/{repoId}/tag", taggitHandler::addTagToRepo)
+                DELETE("/{repoId}/tag", taggitHandler::deleteTagFromRepo)
+                GET("/search", taggitHandler::searchRepoByTags)
+            }
         }
     }
 }

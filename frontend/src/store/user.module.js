@@ -1,5 +1,4 @@
 import axios from "axios";
-import {TAGGIT_BASE_API_URL} from "@/common/config";
 
 const state = {
     id: '',
@@ -53,7 +52,7 @@ const mutations = {
 const actions = {
     fetchUser({commit}, params) {
         commit('fetchingData');
-        axios.get(TAGGIT_BASE_API_URL + '/user/')
+        axios.get('/api/user/')
             .then(({data}) => {
                 commit('getUserData', data);
             })

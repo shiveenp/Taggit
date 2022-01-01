@@ -1,31 +1,24 @@
 package io.shiveenp.taggit.api
 
-import io.shiveenp.taggit.config.ExternalProperties
 import io.shiveenp.taggit.models.TagInput
 import io.shiveenp.taggit.service.TaggitService
 import io.shiveenp.taggit.util.toUUID
-import io.shiveenp.taggit.util.toUri
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.*
 
-
 @Component
 class TaggitHandler(
     private val taggitService: TaggitService,
-    private val externalProperties: ExternalProperties,
 ) {
-    suspend fun loginOrSignup(req: ServerRequest): ServerResponse {
-        taggitService.loginOrRegister()
-        return temporaryRedirect(externalProperties.uiUrl.toUri()).buildAndAwait()
-    }
-
     suspend fun getUser(req: ServerRequest): ServerResponse {
-        val user = taggitService.getUser()
-        return if (user != null) {
-            ok().bodyValueAndAwait(user)
+        val existingUser = taggitService.getUser()
+        return if (existingUser != null) {
+            ok().bodyValueAndAwait(existingUser)
         } else {
-            notFound().buildAndAwait()
+            // user logging in first time or user does not exist
+            val createdUser = taggitService.loginOrRegister()
+            ok().bodyValueAndAwait(createdUser)
         }
     }
 

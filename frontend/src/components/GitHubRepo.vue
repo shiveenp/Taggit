@@ -35,7 +35,6 @@
 
 <script>
 import axios from "axios";
-import {TAGGIT_BASE_API_URL} from "../common/config";
 
 export default {
   data() {
@@ -48,17 +47,15 @@ export default {
   name: "GithubRepo",
   methods: {
     saveTag(tag) {
-      const userId = localStorage.getItem('taggit-userId');
       this.$store.dispatch('addTagToRepo',
           {
-            userId: userId,
             repoId: this.id,
             tag: tag
           });
       this.$store.dispatch('addTag', tag);
     },
     removeTag(tag) {
-      axios.delete(TAGGIT_BASE_API_URL + '/repos/' + this.id + '/tag?tag=' + tag);
+      axios.delete('/api/repos/' + this.id + '/tag?tag=' + tag);
       this.$store.dispatch('removeTag', tag);
     },
     mountTags() {

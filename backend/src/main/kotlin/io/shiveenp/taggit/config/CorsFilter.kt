@@ -8,8 +8,8 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 
-
-@Profile("web", "local", "all")
+// This is only needed for local debugging. When compiled, the SPA is served from within the server so CORS is not needed.
+@Profile("local")
 @Configuration
 class CorsFilter {
     @Bean
@@ -29,6 +29,6 @@ class CorsFilter {
     }
 
     companion object {
-        private const val FRONTEND_LOCAL = "http://localhost:8081"
+        private const val FRONTEND_LOCAL = "http://localhost:3000"
     }
 }
