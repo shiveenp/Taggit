@@ -47,10 +47,8 @@ export default {
   name: "GithubRepo",
   methods: {
     saveTag(tag) {
-      const userId = localStorage.getItem('taggit-userId');
       this.$store.dispatch('addTagToRepo',
           {
-            userId: userId,
             repoId: this.id,
             tag: tag
           });
