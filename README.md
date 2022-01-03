@@ -1,23 +1,30 @@
 # Taggit
 
-Taggit allows users to connect their github accounts and manage their starred repos.
+Taggit is a repository starred repositories organisation tool for Github. It was built to enable easy tagging and 
+organisation of repositories in your Github stars and allows easy recall for libraries or cool projects you found but
+forgot the name of.
 
-## Motivation
-
-This project was borne out of my own need to be able to organise several OSS projects that I routinely stared on github and have them allocated within neat tags.
-
+The project runs on springboot backend core and a VueJS frontend. It can be easily deployed to your favourite cloud provider 
+or via a PAAS.
 
 ## Project setup
 
-The project is split into two a backend and front end. 
+The project is split into backend and front end. 
 
 The backend is written using Kotlin and Spring.
 
 The frontend is written using [VueJs](https://vuejs.org/) and accompanying libraries like Vuex and VueRouter etc.
 
+
+## Local Dev
+
 ### Running the backend
 
 You can run the backend by directly running the main class in the App.kt file or preferably using Docker.
+
+Since we use springboot the easiest way to run backend is to run the following command in the root of the project.
+
+`./gradlew :backend:bootRun`
 
 For running with Docker ensure you have docker installed, for Mac that can be done vie brew:
 
@@ -31,17 +38,13 @@ Once docker is installed, navigate to the backend folder and run docker compose:
 docker-compose up
 ```
 
-To run postgres only do:
+To run just testing postgres do:
 
 ```shell
-docker-compose up --db
+docker-compose --profile test up
 ```
 
-Once done, you'll need to also bootstrap the tables. Ideally this should be automated but I haven't gotten around to it. You can do that via a flyway command:
-
-```shell script
-./gradlew flywayMigrate
-```
+Once Postgres is started, create a table named `taggit` inside your local docker postgres.
 
 Once that is successfully completed, we can fire up the front end.
 
@@ -59,11 +62,7 @@ Once done, fire up the frontend using vue cli:
 npm run serve
 ```
 
-Now you can navigate to http://localhost:8080 on your browser to see the login window. That screen will take you through the github Oauth login.
-
-(Make sure you the right github credentials in the backend before trying to use the frontend, contact the project maintainer to get them)
-
-Once done, you can use the `Resync` button to sync all your repos to your local Taggit database.
+Now you can navigate to http://localhost:3000 on your browser to see the SPA. Please click `Sync` the first time to have all your repos from github synced.
 
 ### Compiles and minifies for production
 ```
@@ -74,3 +73,15 @@ npm run build
 ```
 npm run lint
 ```
+
+## Packing and Deploys
+
+The whole app can be deployed via the compiled JAR as a monolithic binary i.e. the frontend and the server run from the 
+same Springboot Netty server. This simplifies deployment as you don't have to worry about serving the HTML/CSS/JS assets 
+from elsewhere.
+
+The whole app can be packed by running the following command inside the repo root:
+
+`./gradlew stage`
+
+This command will build the frontend and the backend and move all the files inside a static directory for backend ay build time.
