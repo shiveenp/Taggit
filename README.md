@@ -1,6 +1,6 @@
 # Taggit
 
-Taggit is a repository starred repositories organisation tool for Github. It was built to enable easy tagging and 
+Taggit is a starred repositories organisation tool for Github. It was built to enable easy tagging and 
 organisation of repositories in your Github stars and allows easy recall for libraries or cool projects you found but
 forgot the name of.
 
