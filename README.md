@@ -85,3 +85,5 @@ The whole app can be packed by running the following command inside the repo roo
 `./gradlew stage`
 
 This command will build the frontend and the backend and move all the files inside a static directory for backend ay build time.
+
+I deploy currently build images to try [here](https://hub.docker.com/repository/docker/shiveenp/taggit) but feel free to fork and deploy your own.
