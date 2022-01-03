@@ -5,7 +5,6 @@ node_modules
 /dist
 
 # local env files
-.env
 .env.prod
 .env.*.prod
 .env.local
