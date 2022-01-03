@@ -78,7 +78,7 @@ tasks.register<Copy>("processFrontendResources") {
     description = "Process frontend resources"
     dependsOn(project(":frontend").tasks.named("assembleFrontend"))
 
-    from(frontendBuildDir, frontendResourcesDir)
+    from(frontendBuildDir).into(frontendResourcesDir)
 }
 
 tasks.named("processResources") {
