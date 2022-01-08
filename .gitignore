@@ -1,3 +1,7 @@
+.gradle
+frontend/_static
+frontend/node
+
 .DS_Store
 node_modules
 /backend/.gradle
