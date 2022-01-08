@@ -9,7 +9,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.10"
     kotlin("plugin.jpa") version "1.6.10"
     // versioning releases
-    id("pl.allegro.tech.build.axion-release") version "1.13.6"
+    id("pl.allegro.tech.build.axion-release") version "1.13.5"
     // packaging frontend assets
     id("org.siouan.frontend-jdk11") version "6.0.0"
 }
