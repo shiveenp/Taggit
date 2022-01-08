@@ -1,18 +1,22 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    // spring
     id("org.springframework.boot") version "2.6.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    // For packaging frontend assets
-    id("org.siouan.frontend-jdk11") version "6.0.0"
+    // kotlin
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.spring") version "1.6.10"
     kotlin("plugin.jpa") version "1.6.10"
+    // versioning releases
+    id("pl.allegro.tech.build.axion-release") version "1.13.6"
+    // packaging frontend assets
+    id("org.siouan.frontend-jdk11") version "6.0.0"
 }
 
 group = "io.shiveenp"
-version = "1.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
+project.version = scmVersion.version
 
 repositories {
     mavenCentral()
