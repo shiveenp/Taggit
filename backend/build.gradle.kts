@@ -9,7 +9,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.10"
     kotlin("plugin.jpa") version "1.6.10"
     // versioning releases
-    id("pl.allegro.tech.build.axion-release") version "1.13.5"
+    id("pl.allegro.tech.build.axion-release") version "1.13.6"
     // packaging frontend assets
     id("org.siouan.frontend-jdk11") version "6.0.0"
 }
@@ -60,7 +60,7 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("io.github.serpro69:kotlin-faker:1.9.0")
     testImplementation("org.apache.commons:commons-math3:3.6.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.0.2")
+    testImplementation("io.kotest:kotest-assertions-core:5.0.3")
 }
 
 tasks.withType<Test> {
