@@ -9,5 +9,6 @@ import org.springframework.core.annotation.Order
 @ConfigurationProperties(prefix = "external")
 data class ExternalProperties(
     val githubUserName: String,
-    val githubAccessToken: String
+    val githubAccessToken: String,
+    val appPassword: String,
 )

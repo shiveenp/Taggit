@@ -1,3 +1,4 @@
+<script src="../store/repo.module.js"></script>
 <template>
   <div class="card">
     <div class="card-content">

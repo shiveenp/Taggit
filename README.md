@@ -87,3 +87,13 @@ The whole app can be packed by running the following command inside the repo roo
 This command will build the frontend and the backend and move all the files inside a static directory for backend ay build time.
 
 I deploy currently build images to try [here](https://hub.docker.com/repository/docker/shiveenp/taggit) but feel free to fork and deploy your own.
+
+You will need to set following variables when deploying:
+
+```
+GITHUB_USERNAME=<add your github username here>
+GITHUB_TOKEN=<add your github personal access token here>
+APP_PASSWORD=<this the password to get it, adds an extra layer of security when deployed publicly on web>
+```
+
+More information on how to create a github personal access token can be found [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)

@@ -1,8 +1,10 @@
 package io.shiveenp.taggit.api
 
+import io.shiveenp.taggit.config.ExternalProperties
 import io.shiveenp.taggit.models.TagInput
 import io.shiveenp.taggit.service.TaggitService
 import io.shiveenp.taggit.util.toUUID
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.*
@@ -10,7 +12,18 @@ import org.springframework.web.reactive.function.server.ServerResponse.*
 @Component
 class TaggitHandler(
     private val taggitService: TaggitService,
+    private val externalProperties: ExternalProperties
 ) {
+    suspend fun login(req: ServerRequest): ServerResponse {
+        val passwordProvided = req.queryParamOrNull("password")
+        if (passwordProvided.isNullOrBlank()) {
+            return status(HttpStatus.FORBIDDEN).buildAndAwait()
+        }
+        if (externalProperties.appPassword == passwordProvided) {
+            return ok().buildAndAwait()
+        }
+        return status(HttpStatus.FORBIDDEN).buildAndAwait()
+    }
     suspend fun getUser(req: ServerRequest): ServerResponse {
         val existingUser = taggitService.getUser()
         return if (existingUser != null) {

@@ -65,10 +65,8 @@ export default {
       this.$store.dispatch("changePageNm", pageNm)
       this.$store.dispatch('fetchRepos');
     },
-    gotoUpdateProfile() {
-      this.$router.push({name: 'account'});
-    }
-  },
+  }
+  ,
   created() {
     this.fetchUserDetails();
   }

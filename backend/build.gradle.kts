@@ -85,6 +85,6 @@ tasks.register<Copy>("processFrontendResources") {
     from(frontendBuildDir).into(frontendResourcesDir)
 }
 
-tasks.named("processResources") {
+tasks.named("bootJar") {
     dependsOn(tasks.named("processFrontendResources"))
 }
