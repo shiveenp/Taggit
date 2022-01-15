@@ -136,7 +136,7 @@ class TaggitService(
     }
 
     suspend fun getUntaggedRepos(): List<Any> {
-        val sqlToExecute = "SELECT * FROM repo r WHERE r.metadata is null OR r.metadata @> '{\"tags\": []}' OR r.metadata @> '{}' order by r.repo_name asc"
+        val sqlToExecute = "SELECT * FROM repo r WHERE r.metadata->>'tags' IS NULL order by r.repo_name asc"
         return executeSqlOnRepos(sqlToExecute)
     }
 
