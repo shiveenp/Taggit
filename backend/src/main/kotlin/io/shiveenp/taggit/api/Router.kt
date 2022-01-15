@@ -11,6 +11,9 @@ class Router {
     @Bean
     fun routes(taggitHandler: TaggitHandler) = coRouter {
         "/api".nest {
+            "/login".nest {
+                GET("", taggitHandler::login)
+            }
             "/user".nest {
                 GET("/", taggitHandler::getUser)
             }
