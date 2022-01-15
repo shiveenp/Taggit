@@ -75,14 +75,15 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.register<Copy>("processFrontendResources") {
-    val frontendBuildDir = file("${project(":frontend")}/_static")
+    val frontendBuildDir = file("../frontend/_static")
     val frontendResourcesDir = file("${project.buildDir}/resources/main/static")
 
     group = "Frontend"
     description = "Process frontend resources"
     dependsOn(project(":frontend").tasks.named("assembleFrontend"))
 
-    from(frontendBuildDir).into(frontendResourcesDir)
+    from(frontendBuildDir)
+    into(frontendResourcesDir)
 }
 
 tasks.named("bootJar") {

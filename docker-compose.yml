@@ -16,7 +16,8 @@ services:
       - DATABASE_PASSWORD=postgres
       - GITHUB_ACCESS_TOKEN=
       - GITHUB_USER_NAME=
-      - UI_URL=http://localhost:8081
+      - APP_PASSWORD=
+      - UI_URL=http://localhost:3000
       - ACTIVE_PROFILE=all
   postgres:
     profiles: ["prod"]
