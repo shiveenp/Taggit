@@ -71,9 +71,20 @@ class TaggitHandler(
         return ok().bodyValueAndAwait(updatedRepo)
     }
 
-    suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
-        val tags = req.queryParams()["tag"] ?: emptyList()
+    suspend fun searchRepos(req: ServerRequest): ServerResponse {
+        val tags = req.queryParams()["tag"]
+        val text = req.queryParams()["text"]
+        if (tags != null && text != null) {
+            return badRequest().bodyValueAndAwait("can't mix and match tag and text input")
+        }
+        if (tags != null) {
         return ok().bodyValueAndAwait(taggitService.searchUserReposByTags(tags))
+        }
+
+        if (text != null) {
+            return ok().bodyValueAndAwait(taggitService.searchReposByText(text))
+        }
+        return badRequest().bodyValueAndAwait("either send tag or text as input")
     }
 
     suspend fun searchUntaggedRepos(req: ServerRequest): ServerResponse {

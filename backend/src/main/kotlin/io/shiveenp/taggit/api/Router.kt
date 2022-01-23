@@ -25,7 +25,7 @@ class Router {
                 GET("/tags", taggitHandler::getRepoTags)
                 POST("/{repoId}/tag", taggitHandler::addTagToRepo)
                 DELETE("/{repoId}/tag", taggitHandler::deleteTagFromRepo)
-                GET("/search", taggitHandler::searchRepoByTags)
+                GET("/search", taggitHandler::searchRepos)
             }
         }
     }
