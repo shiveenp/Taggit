@@ -1,6 +1,7 @@
 package io.shiveenp.taggit.api
 
 import io.shiveenp.taggit.config.ExternalProperties
+import io.shiveenp.taggit.models.SearchInput
 import io.shiveenp.taggit.models.TagInput
 import io.shiveenp.taggit.service.TaggitService
 import io.shiveenp.taggit.util.toUUID
@@ -24,6 +25,7 @@ class TaggitHandler(
         }
         return status(HttpStatus.FORBIDDEN).buildAndAwait()
     }
+
     suspend fun getUser(req: ServerRequest): ServerResponse {
         val existingUser = taggitService.getUser()
         return if (existingUser != null) {
@@ -71,9 +73,17 @@ class TaggitHandler(
         return ok().bodyValueAndAwait(updatedRepo)
     }
 
-    suspend fun searchRepoByTags(req: ServerRequest): ServerResponse {
-        val tags = req.queryParams()["tag"] ?: emptyList()
-        return ok().bodyValueAndAwait(taggitService.searchUserReposByTags(tags))
+    suspend fun searchReposUsingTags(req: ServerRequest): ServerResponse {
+        val tags = req.queryParams()["tag"]
+        if (tags != null) {
+            return ok().bodyValueAndAwait(taggitService.searchUserReposByTags(tags))
+        }
+        return badRequest().bodyValueAndAwait("either send tag or text as input")
+    }
+
+    suspend fun searchReposUsingKey(req: ServerRequest): ServerResponse {
+        val searchInput = req.awaitBody<SearchInput>()
+        return ok().bodyValueAndAwait(taggitService.searchReposByKey(searchInput))
     }
 
     suspend fun searchUntaggedRepos(req: ServerRequest): ServerResponse {

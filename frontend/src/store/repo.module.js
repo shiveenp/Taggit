@@ -45,6 +45,9 @@ const mutations = {
     },
     changePageNm(state, data) {
         state.pageNm = data;
+    },
+    setActiveSearchRepoData(state, data) {
+        state.reposToDisplay = data;
     }
 };
 
@@ -75,7 +78,7 @@ const actions = {
     },
     fetchReposUsingTags({commit}, params) {
         commit('fetchingData');
-        axios.get('/api/repos/search', {
+        axios.get('/api/repos/search/tag', {
             params: {
                 tag: params.tags
             },
@@ -93,7 +96,7 @@ const actions = {
     },
     fetchUntaggedRepos({commit}, params) {
         commit('fetchingData');
-        axios.get('/api/repos/untagged')
+        axios.get('/api/repos/search/untagged')
             .then(({data}) => {
                 commit('getActiveTagRepoData', data);
                 commit('fetchFinished')

@@ -140,17 +140,27 @@ class TaggitService(
         return executeSqlOnRepos(sqlToExecute)
     }
 
-    suspend fun searchUserReposByTags(tags: List<String>): List<Any> {
-        val tagsJsonBQuery = tags.map {
+    suspend fun searchReposByKey(searchInput: SearchInput): List<TaggitRepo> {
+        val textToSearch = searchInput.keys.joinToString(" & ")
+        val sqlToExecute = """
+            select * from repo
+            where repo_name_ts @@ to_tsquery('english', '$textToSearch') OR github_description_ts @@ to_tsquery('english', '$textToSearch')
+            ORDER BY ts_rank(repo_name_ts, to_tsquery('english', '$textToSearch')) DESC;
+        """.trimIndent()
+        return executeSqlOnRepos(sqlToExecute);
+    }
+
+    suspend fun searchUserReposByTags(tags: List<String>): List<TaggitRepo> {
+        val tagsJsonBQuery = tags.joinToString(" OR ") {
             "r.metadata @> '{\"tags\":[\"$it\"]}'"
-        }.joinToString(" OR ")
+        }
         val sqlToExecute =
             "SELECT * FROM repo r WHERE $tagsJsonBQuery order by r.repo_name asc"
         return executeSqlOnRepos(sqlToExecute)
     }
 
     @Transactional(readOnly = true)
-    fun executeSqlOnRepos(sqlToExecute: String): List<Any> {
+    fun executeSqlOnRepos(sqlToExecute: String): List<TaggitRepo> {
         val entityManager = entityManagerFactory.createEntityManager()
         try {
             return entityManager.createNativeQuery(sqlToExecute)
@@ -178,7 +188,8 @@ class TaggitService(
                     )
                 }
         } catch (ex: Exception) {
-            logger.error(ex) { "Unable to retrieve tags" }
+            logger.error(ex) { "Unable to extract result set" }
+            // todo: add proper exception and rethrow here
             return emptyList()
         } finally {
             entityManager.close()

@@ -12,6 +12,9 @@
           <b-navbar-item>
             <RepoSync/>
           </b-navbar-item>
+          <b-navbar-item>
+            <RepoSearch></RepoSearch>
+          </b-navbar-item>
         </template>
       </b-navbar>
     </div>
@@ -49,10 +52,11 @@ import {mapGetters} from "vuex";
 import Repos from "../components/Repos";
 import TagsList from "../components/TagsList";
 import RepoSync from "../components/RepoSync";
+import RepoSearch from "@/components/RepoSearch";
 
 export default {
   name: "Home",
-  components: {TagsList, Repos, RepoSync},
+  components: {RepoSearch, TagsList, Repos, RepoSync},
   computed: {
     ...mapGetters(["userName", "email", "githubUserName", "githubUserId", "isLoading", "reposToDisplay", "pageNm", "pageSize", "total", "activeTags",
       "userAvatarUrl"])
