@@ -140,8 +140,8 @@ class TaggitService(
         return executeSqlOnRepos(sqlToExecute)
     }
 
-    suspend fun searchReposByText(text: List<String>): List<TaggitRepo> {
-        val textToSearch = text.joinToString(" & ")
+    suspend fun searchReposByKey(searchInput: SearchInput): List<TaggitRepo> {
+        val textToSearch = searchInput.keys.joinToString(" & ")
         val sqlToExecute = """
             select * from repo
             where repo_name_ts @@ to_tsquery('english', '$textToSearch') OR github_description_ts @@ to_tsquery('english', '$textToSearch')

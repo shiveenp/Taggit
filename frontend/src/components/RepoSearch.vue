@@ -4,7 +4,9 @@
              type="search"
              icon="magnify"
              icon-clickable
-             @icon-click="searchIconClick">
+             v-model="searchKey"
+             v-on:keyup.native.enter="searchRepos"
+             @icon-click="searchRepos">
     </b-input>
   </b-field>
 </template>
@@ -12,9 +14,15 @@
 <script>
 export default {
   name: "RepoSearch",
+  data() {
+    return {
+      searchKey: '',
+    }
+  },
   methods: {
-    searchIconClick() {
-
+    searchRepos() {
+      // this.$store.dispatch('setSearchKey', this.searchKey);
+      this.$store.dispatch('fetchReposUsingSearchKey', this.searchKey);
     }
   }
 }

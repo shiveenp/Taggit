@@ -57,6 +57,10 @@ data class TagInput(
     val tag: String
 )
 
+data class SearchInput(
+    val keys: List<String>
+)
+
 data class PagedResponse<T>(
     val data: List<T>,
     val pageNum: Int,
