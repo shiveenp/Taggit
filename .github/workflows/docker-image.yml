@@ -2,7 +2,8 @@ name: Create and Upload Taggit Image
 
 on:
   push:
-    branches: ['release']
+    tags:
+      - 'v*.*.*'
 
 env:
   REGISTRY: ghcr.io
