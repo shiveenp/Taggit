@@ -3,7 +3,7 @@ plugins {
 }
 
 frontend {
-    nodeDistributionUrlPathPattern.set("vVERSION/node-vVERSION-darwin-x64.TYPE")
+    nodeDistributionProvided.set(false)
     nodeVersion.set("14.17.3")
     assembleScript.set("run build")
 }
