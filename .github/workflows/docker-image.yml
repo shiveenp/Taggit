@@ -25,11 +25,6 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14.17.0'
-
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
@@ -37,9 +32,18 @@ jobs:
         run: ./gradlew stage
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          image: shiveenp/taggit
+          registry: ghcr.io
+          githubOrg: override-org # optional
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+#        with:
+#          context: .
+#          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
