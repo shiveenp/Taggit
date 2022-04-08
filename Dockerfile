@@ -9,6 +9,7 @@ WORKDIR taggit
 COPY --from=builder taggit/dependencies/ ./
 COPY --from=builder taggit/spring-boot-loader/ ./
 COPY --from=builder taggit/snapshot-dependencies/ ./
+RUN true
 COPY --from=builder taggit/application/ ./
 EXPOSE 8080
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
