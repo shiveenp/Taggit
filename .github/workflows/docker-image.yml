@@ -35,6 +35,7 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
           image: shiveenp/taggit
+          addLatest: true
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
