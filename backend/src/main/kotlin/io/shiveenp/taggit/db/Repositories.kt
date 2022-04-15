@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface TaggitUserRepository : CrudRepository<TaggitUserEntity, UUID> {
+interface UserRepository : CrudRepository<TaggitUserEntity, UUID> {
     fun findByGithubUserId(githubUserId: Long): TaggitUserEntity?
 }
 
 @Repository
-interface TaggitRepoRepository : PagingAndSortingRepository<TaggitRepoEntity, UUID>
+interface RepoRepository : PagingAndSortingRepository<TaggitRepoEntity, UUID>
