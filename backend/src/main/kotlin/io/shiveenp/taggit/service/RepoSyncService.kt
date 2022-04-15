@@ -1,7 +1,7 @@
 package io.shiveenp.taggit.service
 
 import io.shiveenp.taggit.db.TaggitRepoEntity
-import io.shiveenp.taggit.db.TaggitRepoRepository
+import io.shiveenp.taggit.db.RepoRepository
 import io.shiveenp.taggit.models.GithubStargazingResponse
 import io.shiveenp.taggit.util.notContains
 import mu.KotlinLogging
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class RepoSyncService(
     private val githubService: GithubService,
-    private val taggitRepoRepository: TaggitRepoRepository
+    private val repoRepository: RepoRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -24,12 +24,12 @@ class RepoSyncService(
     fun syncUserStargazingData() {
         logger.debug { "Initiating repo sync..." }
         val repos = getUserStarredReposToSync()
-        val existingRepos = taggitRepoRepository.findAll()
+        val existingRepos = repoRepository.findAll()
         val currentSyncedRepoIds = existingRepos.map { it.repoId }
         repos.filter {
             currentSyncedRepoIds.notContains(it.id)
         }.forEach {
-            taggitRepoRepository.save(TaggitRepoEntity.from(it))
+            repoRepository.save(TaggitRepoEntity.from(it))
         }
         logger.debug { "Finished syncing repos!" }
     }

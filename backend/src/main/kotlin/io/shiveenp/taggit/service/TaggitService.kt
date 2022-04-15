@@ -23,8 +23,8 @@ import javax.persistence.EntityManagerFactory
 @Service
 class TaggitService(
     private val githubService: GithubService,
-    private val userRepository: TaggitUserRepository,
-    private val repoRepository: TaggitRepoRepository,
+    private val userRepository: UserRepository,
+    private val repoRepository: RepoRepository,
     private val entityManagerFactory: EntityManagerFactory,
     private val requestQueueRepository: RequestQueueRepository,
     private val mapper: ObjectMapper
@@ -102,10 +102,18 @@ class TaggitService(
         if (isUntaggedKeyword) {
             throw IllegalArgumentException("Cannot use 'untagged' as it's reserved")
         }
+        val sanitizedTag = sanitizeRepoTag(tagInput.tag)
+        if (sanitizedTag.isBlank()) {
+            throw IllegalArgumentException("The tag does not contain acceptable characters")
+        }
         return repoRepository.findByIdOrNull(repoId)?.let {
-            val updatedMetadata = addTagToMetadata(it.metadata, tagInput.tag)
+            val updatedMetadata = addTagToMetadata(it.metadata, sanitizedTag)
             repoRepository.save(it.withUpdated(metadata = updatedMetadata))
         }
+    }
+
+    private fun sanitizeRepoTag(repoTag: String): String {
+        return repoTag.filter { it.isLetterOrDigit() }
     }
 
     private fun addTagToMetadata(metadata: TagMetadata?, tag: String): TagMetadata {

@@ -48,12 +48,13 @@ export default {
   name: "GithubRepo",
   methods: {
     saveTag(tag) {
+      let sanitizedTag = this.sanitizeTag(tag);
       this.$store.dispatch('addTagToRepo',
           {
             repoId: this.id,
-            tag: tag
+            tag: sanitizedTag
           });
-      this.$store.dispatch('addTag', tag);
+      this.$store.dispatch('addTag', sanitizedTag);
     },
     removeTag(tag) {
       axios.delete('/api/repos/' + this.id + '/tag?tag=' + tag);
@@ -66,6 +67,9 @@ export default {
     },
     makeTagInputVisible() {
       this.isTagInputVisible = !this.isTagInputVisible
+    },
+    sanitizeTag(tag) {
+      return tag.replace(/[^a-zA-Z0-9]/g, '')
     }
   },
   mounted() {

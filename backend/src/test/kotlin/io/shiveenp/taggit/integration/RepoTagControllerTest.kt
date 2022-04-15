@@ -1,7 +1,11 @@
-package io.shiveenp.taggit
+package io.shiveenp.taggit.integration
 
-import io.shiveenp.taggit.db.TaggitRepoRepository
-import io.shiveenp.taggit.db.TaggitUserRepository
+import io.shiveenp.taggit.TaggitApplication
+import io.shiveenp.taggit.db.RepoRepository
+import io.shiveenp.taggit.db.UserRepository
+import io.shiveenp.taggit.generateMockRepoEntity
+import io.shiveenp.taggit.generateMockUserEntity
+import io.shiveenp.taggit.generateRandomTagInput
 import io.shiveenp.taggit.models.TagMetadata
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.hasItem
@@ -35,10 +39,10 @@ class RepoTagControllerTest {
     private val testUser = generateMockUserEntity()
 
     @Autowired
-    private lateinit var taggitUserRepository: TaggitUserRepository
+    private lateinit var userRepository: UserRepository
 
     @Autowired
-    private lateinit var taggitRepoRepository: TaggitRepoRepository
+    private lateinit var repoRepository: RepoRepository
 
     companion object {
 
@@ -63,7 +67,7 @@ class RepoTagControllerTest {
     @Test
     fun `we can save single tags correctly`() {
         val testRepo = generateMockRepoEntity(testUser.id)
-        taggitRepoRepository.save(testRepo)
+        repoRepository.save(testRepo)
         val tagInputToSave = generateRandomTagInput()
         webTestClient.post()
             .uri("/user/${testUser.id}/repos/${testRepo.id}/tag")
@@ -81,7 +85,7 @@ class RepoTagControllerTest {
     @Test
     fun `we can save multiple tags correctly`() {
         val testRepo = generateMockRepoEntity(testUser.id)
-        taggitRepoRepository.save(testRepo)
+        repoRepository.save(testRepo)
         val tagInputToSave1 = generateRandomTagInput()
         val tagInputToSave2 = generateRandomTagInput()
         // save first tag
@@ -120,7 +124,7 @@ class RepoTagControllerTest {
     fun `we can delete single tags correctly`() {
         val tagToDelete = "hello,fake-tag"
         val testRepo = generateMockRepoEntity(testUser.id, TagMetadata(listOf(tagToDelete)))
-        taggitRepoRepository.save(testRepo)
+        repoRepository.save(testRepo)
 
         // technically you wanna check that the tag was saved properly before checking again,
         // but in this case we're trusting the repository impl and would hopefully test that in
@@ -143,7 +147,7 @@ class RepoTagControllerTest {
         val tagToDelete3 = "hello, fake tag 3"
         val testRepo = generateMockRepoEntity(testUser.id,
             TagMetadata(listOf(tagToDelete1, tagToDelete2, tagToDelete3)))
-        taggitRepoRepository.save(testRepo)
+        repoRepository.save(testRepo)
 
         // 1 deleted, 2 remaining
         webTestClient.delete()
@@ -194,7 +198,7 @@ class RepoTagControllerTest {
         val testRepo = generateMockRepoEntity(testUser.id,
             TagMetadata(listOf(tagToDelete1, tagToDelete2, tagToDelete3))
         )
-        taggitRepoRepository.save(testRepo)
+        repoRepository.save(testRepo)
 
         // 1 deleted, 3 remaining
         webTestClient.delete()
@@ -239,6 +243,6 @@ class RepoTagControllerTest {
 
     @BeforeAll
     internal fun setUp() {
-        taggitUserRepository.save(testUser)
+        userRepository.save(testUser)
     }
 }

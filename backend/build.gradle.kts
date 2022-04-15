@@ -31,14 +31,15 @@ dependencies {
     // utils
     implementation("com.vladmihalcea:hibernate-types-55:2.14.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.flywaydb:flyway-core:8.3.0")
+    implementation("org.flywaydb:flyway-core:8.5.7")
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
+    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
     // see: https://github.com/netty/netty/issues/11693
-    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.72.Final:osx-aarch_64")
+    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.75.Final:osx-aarch_64")
 
     // kotlin
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -55,12 +56,12 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("io.mockk:mockk:1.12.1")
+    testImplementation("io.mockk:mockk:1.12.3")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("io.github.serpro69:kotlin-faker:1.9.0")
+    testImplementation("io.github.serpro69:kotlin-faker:1.10.0")
     testImplementation("org.apache.commons:commons-math3:3.6.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.0.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.2.2")
 }
 
 tasks.withType<Test> {
