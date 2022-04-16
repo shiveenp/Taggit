@@ -1,8 +1,9 @@
 package io.shiveenp.taggit
 
 import io.github.serpro69.kfaker.Faker
-import io.shiveenp.taggit.db.TaggitRepoEntity
-import io.shiveenp.taggit.db.TaggitUserEntity
+import io.shiveenp.taggit.db.RepoEntity
+import io.shiveenp.taggit.db.UserEntity
+import io.shiveenp.taggit.models.GithubUser
 import io.shiveenp.taggit.models.TagInput
 import io.shiveenp.taggit.models.TagMetadata
 import org.apache.commons.math3.random.RandomDataGenerator
@@ -13,7 +14,7 @@ val faker = Faker()
 val randomNumberGenerator = RandomDataGenerator()
 
 fun generateMockUserEntity() =
-    TaggitUserEntity(
+    UserEntity(
         id = UUID.randomUUID(),
         userName = faker.name.name(),
         email = faker.theITCrowd.emails(),
@@ -26,7 +27,7 @@ fun generateMockUserEntity() =
 
 fun generateMockRepoEntity(userId: UUID? = null,
                            metadata: TagMetadata? = null) =
-    TaggitRepoEntity(
+    RepoEntity(
         id = UUID.randomUUID(),
         repoId = randomNumberGenerator.nextLong(Long.MIN_VALUE, Long.MAX_VALUE),
         repoName = faker.siliconValley.inventions(),
@@ -38,3 +39,12 @@ fun generateMockRepoEntity(userId: UUID? = null,
     )
 
 fun generateRandomTagInput(tag: String? = null) = TagInput(tag ?: faker.book.title())
+
+fun generateMockGithubUser() = GithubUser(
+    id = 100L,
+    login = faker.name.neutralFirstName(),
+    avatarUrl = "https://fake.url",
+    name = faker.name.neutralFirstName(),
+    email = "fake@email.com",
+    githubToken = faker.random.randomString()
+)

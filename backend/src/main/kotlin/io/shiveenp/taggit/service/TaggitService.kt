@@ -46,7 +46,7 @@ class TaggitService(
             )
                 .toDto()
         } else {
-            userRepository.save(TaggitUserEntity.from(githubUser)).toDto()
+            userRepository.save(UserEntity.from(githubUser)).toDto()
         }
         return user
     }
@@ -57,7 +57,7 @@ class TaggitService(
     }
 
     @Transactional(readOnly = true)
-    suspend fun getUserStarredRepos(page: Int?, size: Int?): PagedResponse<TaggitRepo> {
+    suspend fun getUserStarredRepos(page: Int? = null, size: Int? = null): PagedResponse<TaggitRepo> {
         val pageNumber = page ?: DEFAULT_REPO_RESULT_PAGE_NUMBER
         val pageSize = size ?: DEFAULT_REPO_RESULT_PAGE_SIZE
         val pageRequest = PageRequest.of(
@@ -97,7 +97,7 @@ class TaggitService(
             }.toSortedSet()
     }
 
-    suspend fun addRepoTag(repoId: UUID, tagInput: TagInput): TaggitRepoEntity? {
+    suspend fun addRepoTag(repoId: UUID, tagInput: TagInput): RepoEntity? {
         val isUntaggedKeyword = tagInput.tag.equals(UNTAGGED_KEYWORD, true)
         if (isUntaggedKeyword) {
             throw IllegalArgumentException("Cannot use 'untagged' as it's reserved")
@@ -128,7 +128,7 @@ class TaggitService(
         }
     }
 
-    fun deleteTagFromRepo(repoId: UUID, tagToDelete: String): TaggitRepoEntity {
+    fun deleteTagFromRepo(repoId: UUID, tagToDelete: String): RepoEntity {
         val updatedRepoWithTagDeleted = repoRepository.findByIdOrNull(repoId)?.let {
             val updatedMetadata = deleteTagFromMetadataOrNull(it.metadata, tagToDelete)
             repoRepository.save(it.withUpdated(metadata = updatedMetadata))

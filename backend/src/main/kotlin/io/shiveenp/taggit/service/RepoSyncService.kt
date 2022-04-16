@@ -1,6 +1,6 @@
 package io.shiveenp.taggit.service
 
-import io.shiveenp.taggit.db.TaggitRepoEntity
+import io.shiveenp.taggit.db.RepoEntity
 import io.shiveenp.taggit.db.RepoRepository
 import io.shiveenp.taggit.models.GithubStargazingResponse
 import io.shiveenp.taggit.util.notContains
@@ -29,7 +29,7 @@ class RepoSyncService(
         repos.filter {
             currentSyncedRepoIds.notContains(it.id)
         }.forEach {
-            repoRepository.save(TaggitRepoEntity.from(it))
+            repoRepository.save(RepoEntity.from(it))
         }
         logger.debug { "Finished syncing repos!" }
     }

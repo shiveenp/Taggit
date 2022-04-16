@@ -13,7 +13,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "users")
-data class TaggitUserEntity(
+data class UserEntity(
     @Id
     val id: UUID,
     val userName: String,
@@ -38,8 +38,8 @@ data class TaggitUserEntity(
     }
 
     companion object {
-        fun from(githubUser: GithubUser): TaggitUserEntity {
-            return TaggitUserEntity(
+        fun from(githubUser: GithubUser): UserEntity {
+            return UserEntity(
                 id = UUID.randomUUID(),
                 userName = githubUser.name ?: githubUser.login,
                 email = githubUser.email,
@@ -56,7 +56,7 @@ data class TaggitUserEntity(
 @Entity
 @Table(name = "repo")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
-data class TaggitRepoEntity(
+data class RepoEntity(
     @Id
     val id: UUID,
     val repoId: Long,
@@ -82,15 +82,15 @@ data class TaggitRepoEntity(
         )
     }
 
-    fun withUpdated(metadata: TagMetadata? = null): TaggitRepoEntity {
+    fun withUpdated(metadata: TagMetadata? = null): RepoEntity {
         return this.copy(
             metadata = metadata ?: this.metadata
         )
     }
 
     companion object {
-        fun from(response: GithubStargazingResponse): TaggitRepoEntity {
-            return TaggitRepoEntity(
+        fun from(response: GithubStargazingResponse): RepoEntity {
+            return RepoEntity(
                 id = UUID.randomUUID(),
                 repoId = response.id,
                 repoName = response.name,
