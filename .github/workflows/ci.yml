@@ -1,9 +1,13 @@
 name: Taggit CI
 
-on: [push]
+on:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
+    name: Taggit Build Check
     runs-on: ubuntu-latest
 
     steps:
