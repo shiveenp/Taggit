@@ -1,6 +1,6 @@
 package io.shiveenp.taggit.models
 
-import io.shiveenp.taggit.db.TaggitUserEntity
+import io.shiveenp.taggit.db.UserEntity
 import java.time.LocalDateTime
 import java.util.*
 
@@ -24,8 +24,8 @@ data class TaggitUser(
         )
     }
 
-    fun toEntity(): TaggitUserEntity {
-        return TaggitUserEntity(
+    fun toEntity(): UserEntity {
+        return UserEntity(
             id = this.id,
             userName = this.userName,
             email = this.email,
