@@ -1,7 +1,6 @@
 package io.shiveenp.taggit.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -11,11 +10,10 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.OverrideMockKs
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
-import io.mockk.verify
 import io.shiveenp.taggit.db.*
-import io.shiveenp.taggit.generateMockGithubUser
-import io.shiveenp.taggit.generateMockRepoEntity
-import io.shiveenp.taggit.generateMockUserEntity
+import io.shiveenp.taggit.mockGithubUser
+import io.shiveenp.taggit.mockRepoEntity
+import io.shiveenp.taggit.mockUserEntity
 import io.shiveenp.taggit.models.TagInput
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
@@ -47,9 +45,9 @@ class TaggitServiceTest {
     @MockK
     private lateinit var mapper: ObjectMapper
 
-    private val userEntity = generateMockUserEntity()
-    private val repoEntity = generateMockRepoEntity()
-    private val githubUser = generateMockGithubUser()
+    private val userEntity = mockUserEntity()
+    private val repoEntity = mockRepoEntity()
+    private val githubUser = mockGithubUser()
 
 
     @OverrideMockKs

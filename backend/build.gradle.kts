@@ -37,7 +37,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
-    implementation(platform("org.testcontainers:testcontainers-bom:1.14.3")) //bom for testcontainers
+    implementation(platform("org.testcontainers:testcontainers-bom:1.17.1")) //bom for testcontainers
     // see: https://github.com/netty/netty/issues/11693
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.75.Final:osx-aarch_64")
 
