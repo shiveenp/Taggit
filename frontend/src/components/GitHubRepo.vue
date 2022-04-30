@@ -1,4 +1,3 @@
-<script src="../store/repo.module.js"></script>
 <template>
   <div class="card">
     <div class="card-content">
@@ -18,17 +17,20 @@
         <p>{{ githubDescription }}</p>
       </div>
       <div>
-        <b-field>
           <b-taginput
               v-model="tags"
+              autocomplete
+              :data="filteredTags"
+              :allow-new="true"
               ellipsis
+              keep-first
               placeholder="Add a tag"
               size="is-small"
               type="is-dark"
               v-on:add="saveTag"
-              v-on:remove="removeTag">
+              v-on:remove="removeTag"
+              @typing="getFilteredTags">
           </b-taginput>
-        </b-field>
       </div>
     </div>
   </div>
@@ -36,13 +38,17 @@
 
 <script>
 import axios from "axios";
+import {mapGetters} from "vuex";
 
 export default {
   data() {
     return {
       tags: [],
-      isTagInputVisible: false,
+      filteredTags: this.allTags,
     }
+  },
+  computed: {
+    ...mapGetters(["allTags"])
   },
   props: ['id', 'repoName', 'githubLink', 'githubDescription', 'ownerAvatarUrl', 'metadata'],
   name: "GithubRepo",
@@ -65,15 +71,20 @@ export default {
         this.tags = this.metadata.tags;
       }
     },
-    makeTagInputVisible() {
-      this.isTagInputVisible = !this.isTagInputVisible
-    },
     sanitizeTag(tag) {
       return tag.replace(/[^a-zA-Z0-9]/g, '')
+    },
+    getFilteredTags(text) {
+      this.filteredTags = this.allTags.filter((tag) => {
+        return tag
+            .toString()
+            .toLowerCase()
+            .indexOf(text.toLowerCase()) >= 0
+      })
     }
   },
   mounted() {
-    this.mountTags()
+    this.mountTags();
   }
 }
 </script>
