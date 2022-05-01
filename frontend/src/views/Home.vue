@@ -20,9 +20,7 @@
     </div>
     <b-loading v-if="isLoading" :active="isLoading" :can-cancel="false"/>
     <div class="section">
-      <TagsList/>
-    </div>
-    <div class="section">
+      <TagSidebar/>
       <Repos/>
     </div>
     <div v-if="activeTags.length === 0 && reposToDisplay.length !== 0" class="section">
@@ -53,10 +51,11 @@ import Repos from "../components/Repos";
 import TagsList from "../components/TagsList";
 import RepoSync from "../components/RepoSync";
 import RepoSearch from "@/components/RepoSearch";
+import TagSidebar from "@/components/TagsSidebar";
 
 export default {
   name: "Home",
-  components: {RepoSearch, TagsList, Repos, RepoSync},
+  components: {TagSidebar, RepoSearch, Repos, RepoSync},
   computed: {
     ...mapGetters(["userName", "email", "githubUserName", "githubUserId", "isLoading", "reposToDisplay", "pageNm", "pageSize", "total", "activeTags",
       "userAvatarUrl"])
